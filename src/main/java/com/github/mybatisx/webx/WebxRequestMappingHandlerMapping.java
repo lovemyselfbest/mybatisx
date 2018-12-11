@@ -35,12 +35,12 @@ public class WebxRequestMappingHandlerMapping extends RequestMappingHandlerMappi
           sb.append(method.getName());
 
 
-          for(var par : method.getParameterTypes()){
-
-              sb.append("/");
-              sb.append(StringUtils.substringAfterLast(par.getName(),"."));
-
-          }
+//          for(var par : method.getParameterTypes()){
+//
+//              sb.append("/");
+//              sb.append(StringUtils.substringAfterLast(par.getName(),"."));
+//
+//          }
 
           var path=  sb.toString().toLowerCase();
 

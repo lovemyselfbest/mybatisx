@@ -30,7 +30,7 @@ public class cacheAspect {
     }
 
 
-    @Pointcut("execution(public * com.github.*.dao..*.*(..))")
+    @Pointcut("execution(public * com.*.*.dao..*.*(..))")
     public void dao() {
     }
 

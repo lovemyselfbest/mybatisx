@@ -35,7 +35,7 @@ public class MethodUtil {
             pds.add(ParameterDescriptor.create(i, type, Arrays.asList(pas), name));
         }
 
-        return MethodDescriptor.create(method.getName(),method, daoClass, rd, pds);
+        return MethodDescriptor.create(method.getName(), method, daoClass, rd, pds);
     }
 
     public static List<Method> listMethods(Class<?> clazz) {
@@ -71,12 +71,14 @@ public class MethodUtil {
 
     static Type resolveType(Type type, TypeToken<?> daoTypeToken) {
 
-        if(genericTypeToken.isAssignableFrom(daoTypeToken)){
-            var type1=  daoTypeToken.resolveType(type).getType();
+        if (genericTypeToken.isAssignableFrom(daoTypeToken)) {
+            var type1 = daoTypeToken.resolveType(type).getType();
             return type1;
         }
-       return type;
+        return type;
     }
+
+    private static final String paramPrefix = "param%d";
 
     private static String[] getParameterNames(Method method, boolean isUseActualParamName) {
         String[] names = new String[method.getGenericParameterTypes().length];
@@ -86,7 +88,8 @@ public class MethodUtil {
                 name = ParamNameResolver.getActualParamName(method, i);
             }
             if (name == null) {
-                name = String.valueOf(i + 1);
+                //name = String.valueOf(i + 1);
+                name = String.format(paramPrefix, i + 1);
             }
             names[i] = name;
         }

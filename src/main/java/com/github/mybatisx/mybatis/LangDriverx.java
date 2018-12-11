@@ -9,11 +9,12 @@ import com.github.mybatisx.descriptor.MethodUtil;
 import com.github.mybatisx.util.MetaUtil;
 import com.github.mybatisx.util.SQL;
 import com.google.common.base.CaseFormat;
+
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ResultMap;
+
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;

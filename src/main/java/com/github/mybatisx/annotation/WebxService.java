@@ -1,5 +1,7 @@
 package com.github.mybatisx.annotation;
 
+import org.springframework.stereotype.Controller;
+
 import java.lang.annotation.*;
 
 @Target({ ElementType.TYPE})

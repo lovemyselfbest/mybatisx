@@ -26,7 +26,7 @@ public class WebxMethodArgumentResolver implements HandlerMethodArgumentResolver
     public boolean supportsParameter(MethodParameter parameter) {
         return true;
     }
-
+    private static final String paramPrefix = "param%d";
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
@@ -53,7 +53,7 @@ public class WebxMethodArgumentResolver implements HandlerMethodArgumentResolver
         var PD = MD.getParameterDescriptors().get(index);
 
         Class<?> parType = PD.getRawType();
-        String v = httpServletRequest.getParameter(PD.getName());
+        String v = httpServletRequest.getParameter(String.format(paramPrefix, index+1));
         if (v == null) {
 
             return TypeResolver.getDefaultValue(parType);

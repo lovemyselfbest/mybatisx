@@ -63,7 +63,7 @@ public class FireFactory {
 
 
 
-        var methodDescriptor = MethodUtil.getMethodDescriptor(daoClazz,method,true);
+        var methodDescriptor = MethodUtil.getMethodDescriptor(daoClazz,method,false);
 
         //methodDescriptor.isUseCache();
 
