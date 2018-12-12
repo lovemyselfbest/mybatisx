@@ -1,16 +1,19 @@
 package com.github.mybatisx.webx;
 
-import java.util.Map;
+import lombok.*;
+
+
+@Builder
+@AllArgsConstructor
 
 public class ResponseData {
 
-    private Map<String, String> data;
+   private int error;
+   private String msg;
 
-    public Map<String, String> getData() {
-        return data;
-    }
+   private Object data;
 
-    public void setData(Map<String, String> data) {
-        this.data = data;
-    }
+   private  Long totalCount;
+
+   private  Long pageCount;
 }

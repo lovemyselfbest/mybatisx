@@ -29,6 +29,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -42,12 +43,15 @@ public class MybatisxConfig implements EnvironmentAware {
 
     private Environment env;
 
+    public MybatisxConfig(){
+        String  mm="";
+    }
 
-//    @Bean
-//    public  MapperScannerRegistrar2 mapperScannerRegistrar2(){
-//
-//        return  new  MapperScannerRegistrar2();
-//    }
+    @Bean
+    public RestTemplate restTemplate(){
+
+        return  new  RestTemplate();
+    }
 
     @Bean
     @ConditionalOnMissingBean(ZookeeperRegistration.class)
