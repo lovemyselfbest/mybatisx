@@ -114,26 +114,17 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
 
     private void writeMap(Object o, HttpOutputMessage outputMessage) throws IOException {
 
-//        StringBuilder stringBuilder = new StringBuilder();
-//        Map<String, String> map = ((ResponseData) o).getData();
-//        for (Map.Entry<String, String> entry : map.entrySet()) {
-//            stringBuilder.append(entry.getKey()).append(ENTRY_SEPARATOR).append(entry.getValue())
-//                    .append(ENTRY_TERMINATOR);
-//        }
-//        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        var map = new HashMap<String, Object>();
-        map.put("error", 0);
-        map.put("msg", "");
-        map.put("data", o);
+
+        var builder= ResponseData.builder().error(0).msg("").data(o);
 
         if(o instanceof Page){
             Long total= Long.valueOf(((Page) o).getTotal());
             Long  pageNum=Long.valueOf(((Page) o).getPages());
-            map.put("totalCount",total);
-            map.put("pageCount",pageNum);
+            builder.totalCount(total).pageCount(pageNum);
+
         }
 
-        String v = JSON.toJSONString(map);
+        String v = JSON.toJSONString(builder.build());
         outputMessage.getBody().write(v.getBytes());
 
 

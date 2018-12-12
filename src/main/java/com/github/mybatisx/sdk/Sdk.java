@@ -1,12 +1,16 @@
 package com.github.mybatisx.sdk;
 
 import com.google.common.reflect.Reflection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Sdk {
 
-    public static <T> T getHandler(Class<T> faceClazz){
+    @Autowired
+    private FeignHandler handler;
 
-        var handler= new FeignHandler();
+    public  <T> T getHandler(Class<T> faceClazz){
 
         return Reflection.newProxy(faceClazz,handler);
     }

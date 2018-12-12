@@ -4,6 +4,8 @@ package com.github.mybatisx.annotation;
 import com.github.mybatisx.aspect.cacheAspect;
 import com.github.mybatisx.config.MapperScannerRegistrar3;
 import com.github.mybatisx.config.MybatisxConfig;
+import com.github.mybatisx.sdk.FeignHandler;
+import com.github.mybatisx.sdk.Sdk;
 import com.github.mybatisx.webx.WebxMvcConfigurationSupport;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClientImportSelector;
@@ -16,7 +18,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited //
-@ImportAutoConfiguration({ cacheAspect.class, MybatisxConfig.class,WebxMvcConfigurationSupport.class})
+@ImportAutoConfiguration({ cacheAspect.class, Sdk.class, FeignHandler.class, MybatisxConfig.class,WebxMvcConfigurationSupport.class})
 @Import({MapperScannerRegistrar3.class})
 public @interface EnableMybatisX {
 
