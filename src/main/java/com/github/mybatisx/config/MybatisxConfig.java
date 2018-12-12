@@ -43,17 +43,15 @@ public class MybatisxConfig implements EnvironmentAware {
     private Environment env;
 
 
-    @Bean
-    public  MapperScannerRegistrar2 mapperScannerRegistrar2(){
-
-        return  new  MapperScannerRegistrar2();
-    }
+//    @Bean
+//    public  MapperScannerRegistrar2 mapperScannerRegistrar2(){
+//
+//        return  new  MapperScannerRegistrar2();
+//    }
 
     @Bean
     @ConditionalOnMissingBean(ZookeeperRegistration.class)
-    public ServiceInstanceRegistration serviceInstanceRegistration(
-
-            ApplicationContext context, ZookeeperDiscoveryProperties properties) {
+    public ServiceInstanceRegistration serviceInstanceRegistration( ApplicationContext context, ZookeeperDiscoveryProperties properties) {
         String appName = context.getEnvironment().getProperty("spring.application.name",
                 "application");
         String version = context.getEnvironment().getProperty("spring.application.version",

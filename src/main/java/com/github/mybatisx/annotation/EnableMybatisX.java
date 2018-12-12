@@ -2,11 +2,13 @@ package com.github.mybatisx.annotation;
 
 
 import com.github.mybatisx.aspect.cacheAspect;
+import com.github.mybatisx.config.MapperScannerRegistrar3;
 import com.github.mybatisx.config.MybatisxConfig;
 import com.github.mybatisx.webx.WebxMvcConfigurationSupport;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClientImportSelector;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
@@ -15,5 +17,12 @@ import java.lang.annotation.*;
 @Documented
 @Inherited //
 @ImportAutoConfiguration({ cacheAspect.class, MybatisxConfig.class,WebxMvcConfigurationSupport.class})
+@Import({MapperScannerRegistrar3.class})
 public @interface EnableMybatisX {
+
+    @AliasFor("mapperScan")
+    String[] value() default {};
+
+    @AliasFor("value")
+    String[] mapperScan() default {};
 }
