@@ -60,7 +60,7 @@ dependencies {
  //  runtimeOnly('org.springframework.boot:spring-boot-devtools')
     runtimeOnly('mysql:mysql-connector-java:8.0.13')
 
-    compileOnly ('org.projectlombok:lombok:1.18.2')
+    compile ('org.projectlombok:lombok:1.18.2')
     annotationProcessor 'org.projectlombok:lombok:1.18.2'
 
    // testImplementation('org.springframework.boot:spring-boot-starter-test')
