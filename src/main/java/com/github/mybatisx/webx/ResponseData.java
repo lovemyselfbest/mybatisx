@@ -5,7 +5,8 @@ import lombok.*;
 
 @Builder
 @AllArgsConstructor
-
+@NoArgsConstructor
+@Data
 public class ResponseData {
 
    private int error;

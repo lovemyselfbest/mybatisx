@@ -118,13 +118,16 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
         var builder= ResponseData.builder().error(0).msg("").data(o);
 
         if(o instanceof Page){
-            Long total= Long.valueOf(((Page) o).getTotal());
-            Long  pageNum=Long.valueOf(((Page) o).getPages());
+            var total= Long.valueOf(((Page) o).getTotal());
+            var pageNum=Long.valueOf(((Page) o).getPages());
             builder.totalCount(total).pageCount(pageNum);
-
         }
 
-        String v = JSON.toJSONString(builder.build());
+        var res= builder.build();
+
+        String v = JSON.toJSONString(res);
+
+
         outputMessage.getBody().write(v.getBytes());
 
 
