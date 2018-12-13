@@ -68,13 +68,11 @@ public class FeignHandler implements InvocationHandler {
         var res = restTemplate.postForObject(url, r, String.class);
 
        var t1=  MD.getReturnType();
-       var b= MD.getReturnDescriptor().isList();
 
 
-       if(b){
+       if(MD.getReturnDescriptor().isList()){
            var clazz= MD.getReturnDescriptor().getMappedClass();
-           var v= JsonUtil.parseToMap(res,clazz);
-           return v;
+           return JsonUtil.parse2list(res,clazz);
        }
 
 

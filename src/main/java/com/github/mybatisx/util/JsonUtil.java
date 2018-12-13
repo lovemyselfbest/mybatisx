@@ -33,4 +33,9 @@ public class JsonUtil {
         ParameterizedTypeImpl outer = new ParameterizedTypeImpl(new Type[]{inner}, null, ResponseData.class);
         return JSONObject.parseObject(json, outer);
     }
+
+    public static <T> ResponseData<T> parseToMap(String json, Class<T> type) {
+        return JSON.parseObject(json,
+                new TypeReference<ResponseData<T>>(type) {});
+    }
 }
