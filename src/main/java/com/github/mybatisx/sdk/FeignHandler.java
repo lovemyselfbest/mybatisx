@@ -3,6 +3,8 @@ package com.github.mybatisx.sdk;
 import com.alibaba.fastjson.JSON;
 import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.cache.FireFactory;
+import com.github.mybatisx.util.JsonUtil;
+import com.github.mybatisx.webx.ResponseData;
 import org.apache.commons.lang3.AnnotationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
@@ -18,6 +20,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Component
@@ -60,9 +65,20 @@ public class FeignHandler implements InvocationHandler {
         var headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         HttpEntity<MultiValueMap<String, Object>> r = new HttpEntity<>(postParameters, headers);
-        var responseMessage = restTemplate.postForObject(url, r, String.class);
+        var res = restTemplate.postForObject(url, r, String.class);
 
-        System.out.println(url);
+       var t1=  MD.getReturnType();
+       var b= MD.getReturnDescriptor().isList();
+
+
+       if(b){
+           var clazz= MD.getReturnDescriptor().getMappedClass();
+           var v= JsonUtil.parseToMap(res,clazz);
+           return v;
+       }
+
+
+
 
 
 

@@ -7,12 +7,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ResponseData {
+public class ResponseData<T> {
 
    private int error;
    private String msg;
 
-   private Object data;
+   private T data;
 
    private  Long totalCount;
 
