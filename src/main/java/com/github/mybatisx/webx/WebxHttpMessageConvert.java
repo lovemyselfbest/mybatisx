@@ -115,6 +115,7 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
     private void writeMap(Object o, HttpOutputMessage outputMessage) throws IOException {
 
 
+
         var builder= ResponseData.builder().error(0).msg("").data(o);
 
         if(o instanceof Page){
