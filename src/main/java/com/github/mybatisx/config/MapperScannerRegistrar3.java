@@ -30,12 +30,14 @@ public class MapperScannerRegistrar3 implements ImportBeanDefinitionRegistrar, E
         if (resourceLoader != null) {
             scanner.setResourceLoader(resourceLoader);
         }
-
-
         scanner.registerFilters();
-
         var scans= new String[packagesToScan.size()];
         scanner.doScan(packagesToScan.toArray(scans));
+
+
+
+
+
     }
 
 

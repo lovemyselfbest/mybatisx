@@ -1,19 +1,19 @@
 package com.github.mybatisx.sdk;
 
 import com.alibaba.fastjson.JSON;
+import com.github.mybatisx.annotation.WebxReference;
 import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.cache.FireFactory;
 import com.github.mybatisx.exception.BizException;
 import com.github.mybatisx.util.JsonUtil;
-import com.github.mybatisx.util.TypeResolver;
+import com.github.mybatisx.util.WebxReferenceUtil;
 import com.github.mybatisx.webx.ResponseData;
-import org.apache.commons.lang3.AnnotationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,14 +24,15 @@ import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Component
+@Order(Integer.MAX_VALUE-1)
 public class FeignHandler implements InvocationHandler {
 
+    public FeignHandler(){
+        System.out.println("66");
+    }
     private static HttpHeaders headers;
 
     static {
@@ -56,9 +57,11 @@ public class FeignHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
 
-        var dao = method.getDeclaringClass();
+
+       var dao = method.getDeclaringClass();
         var pkName = dao.getPackageName();
-        var version = env.getProperty(pkName.toLowerCase(), "");
+       var version= WebxReferenceUtil.getValue(pkName);
+       // var version = env.getProperty(pkName.toLowerCase(), "");
         if (StringUtils.isEmpty(version)) {
             throw new IllegalArgumentException(StringUtils.join("包名：", "pkName ", "没有配置版本号"));
         }

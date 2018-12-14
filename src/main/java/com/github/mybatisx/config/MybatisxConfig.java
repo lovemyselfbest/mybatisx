@@ -6,6 +6,8 @@ import com.github.mybatisx.mybatis.LangDriverx;
 import com.github.mybatisx.mybatis.MyBatisInterceptor;
 
 import com.github.mybatisx.mybatis.MybatisxConfiguration;
+import com.github.mybatisx.sdk.FeignHandler;
+import com.github.mybatisx.sdk.Sdk;
 import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.logging.log4j2.Log4j2Impl;
 import org.apache.ibatis.plugin.Interceptor;
@@ -52,6 +54,19 @@ public class MybatisxConfig implements EnvironmentAware {
 
         return  new  RestTemplate();
     }
+
+
+//    @Bean
+//    public Sdk getSdk(FeignHandler feignHandler){
+//        var obj= new Sdk();
+//        obj.setHandler(feignHandler);
+//        return obj;
+//    }
+//    @Bean
+//    public  AnnotationBean annotationBean(Sdk sdk){
+//
+//        return new AnnotationBean(sdk);
+//    }
 
     @Bean
     @ConditionalOnMissingBean(ZookeeperRegistration.class)
