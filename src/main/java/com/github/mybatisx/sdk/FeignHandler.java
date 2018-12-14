@@ -3,14 +3,18 @@ package com.github.mybatisx.sdk;
 import com.alibaba.fastjson.JSON;
 import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.cache.FireFactory;
+import com.github.mybatisx.exception.BizException;
 import com.github.mybatisx.util.JsonUtil;
+import com.github.mybatisx.util.TypeResolver;
 import com.github.mybatisx.webx.ResponseData;
 import org.apache.commons.lang3.AnnotationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -28,6 +32,14 @@ import java.util.List;
 @Component
 public class FeignHandler implements InvocationHandler {
 
+    private static HttpHeaders headers;
+
+    static {
+        headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+
+    }
+
     @Autowired
     private DiscoveryClient discoveryClient;
 
@@ -35,51 +47,84 @@ public class FeignHandler implements InvocationHandler {
     LoadBalancerClient loadBalancerClient;
 
     @Autowired
-     private RestTemplate restTemplate;
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private Environment env;
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
+
         var dao = method.getDeclaringClass();
-
-      var webx = dao.getAnnotation(WebxService.class);
-
-       var servicePath = String.join("/",webx.value(),"v3");
-
-        var serviceInstance = loadBalancerClient.choose(servicePath);
-
-        String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + "";
-
-       var MD= FireFactory.getFactory().getMD(method);
-
-       url = url +"/"+ MD.getDaoClass().getSimpleName().toLowerCase()+"/"+ MD.getMethod().getName()+"?city=sz";
+        var pkName = dao.getPackageName();
+        var version = env.getProperty(pkName.toLowerCase(), "");
+        if (StringUtils.isEmpty(version)) {
+            throw new IllegalArgumentException(StringUtils.join("包名：", "pkName ", "没有配置版本号"));
+        }
+        var webx = dao.getAnnotation(WebxService.class);
 
         MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
-        int i=1;
-        for(var arg:args){
-            postParameters.add("param"+i, JSON.toJSONString(arg));
+        int i = 1;
+        for (var arg : args) {
+            postParameters.add("param" + i, JSON.toJSONString(arg));
             i++;
         }
 
-
-        var headers = new HttpHeaders();
-        headers.add("Content-Type", "application/x-www-form-urlencoded");
-        HttpEntity<MultiValueMap<String, Object>> r = new HttpEntity<>(postParameters, headers);
-        var res = restTemplate.postForObject(url, r, String.class);
-
-       var t1=  MD.getReturnType();
+        var servicePath = String.join("/", webx.value(), version);
 
 
-       if(MD.getReturnDescriptor().isList()){
-           var clazz= MD.getReturnDescriptor().getMappedClass();
-           return JsonUtil.parse2list(res,clazz);
-       }
+        var MD = FireFactory.getFactory().getMD(method);
+
+        var uri = MD.getDaoClass().getSimpleName().toLowerCase() + "/" + MD.getMethod().getName() + "?city=sz";
+
+        var params = new HttpEntity<MultiValueMap<String, Object>>(postParameters, headers);
+
+        var json = "";
+        int retry = 0;
+        while (retry < 3) {
+
+            try {
+
+                var serviceInstance = loadBalancerClient.choose(servicePath);
+
+                var hostAndPort = StringUtils.join(serviceInstance.getHost(), ":", serviceInstance.getPort());
+
+                var url = StringUtils.join("http://", hostAndPort, "/", uri);
+
+                json = restTemplate.postForObject(url, params, String.class);
+                retry = 3;
+            } catch (Exception ex) {
+
+                System.out.println("retry" + retry);
+                if (retry == 2) {
+                    throw ex;
+                }
+                retry++;
+            } finally {
+
+            }
 
 
+        }
 
 
+        var MD_RD = MD.getReturnDescriptor();
 
+        ResponseData response = null;
+        if (MD_RD.isList()) {
+            var clazz = MD.getReturnDescriptor().getMappedClass();
+            response = JsonUtil.parse2list(json, clazz);
+        } else {
+            var clazz = (Class<?>) MD_RD.getType();
+            response = JsonUtil.parseToMap(json, clazz);
+        }
 
-        return null;
+        if (response.getError() == 10) {
+            throw new BizException(response.getMsg());
+        } else if (response.getError() > 0) {
+            throw new Exception(response.getMsg());
+        }
+        return response.getData();
     }
 }

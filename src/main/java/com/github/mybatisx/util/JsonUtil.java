@@ -35,7 +35,7 @@ public class JsonUtil {
     }
 
     public static <T> ResponseData<T> parseToMap(String json, Class<T> type) {
-        return JSON.parseObject(json,
-                new TypeReference<ResponseData<T>>(type) {});
+        var clazz= new TypeReference<ResponseData<T>>(type) {};
+        return JSON.parseObject(json,clazz);
     }
 }
