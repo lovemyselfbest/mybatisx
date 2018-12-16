@@ -45,60 +45,6 @@ public class MybatisxConfig implements EnvironmentAware {
 
     private Environment env;
 
-    public MybatisxConfig(){
-        String  mm="";
-    }
-
-    @Bean
-    public RestTemplate restTemplate(){
-
-        return  new  RestTemplate();
-    }
-
-
-//    @Bean
-//    public Sdk getSdk(FeignHandler feignHandler){
-//        var obj= new Sdk();
-//        obj.setHandler(feignHandler);
-//        return obj;
-//    }
-//    @Bean
-//    public  AnnotationBean annotationBean(Sdk sdk){
-//
-//        return new AnnotationBean(sdk);
-//    }
-
-    @Bean
-    @ConditionalOnMissingBean(ZookeeperRegistration.class)
-    public ServiceInstanceRegistration serviceInstanceRegistration( ApplicationContext context, ZookeeperDiscoveryProperties properties) {
-        String appName = context.getEnvironment().getProperty("spring.application.name",
-                "application");
-        String version = context.getEnvironment().getProperty("spring.application.version",
-                "v1");
-        appName=String.join("/",appName,version);
-        String host = properties.getInstanceHost();
-        if (!StringUtils.hasText(host)) {
-            throw new IllegalStateException("instanceHost must not be empty");
-        }
-
-        ZookeeperInstance zookeeperInstance = new ZookeeperInstance(context.getId(),
-                appName, properties.getMetadata());
-        ServiceInstanceRegistration.RegistrationBuilder builder = ServiceInstanceRegistration.builder().address(host)
-                .name(appName).payload(zookeeperInstance)
-                .uriSpec(properties.getUriSpec());
-
-        if (properties.getInstanceSslPort() != null) {
-            builder.sslPort(properties.getInstanceSslPort());
-        }
-        if (properties.getInstanceId() != null) {
-            builder.id(properties.getInstanceId());
-        }
-
-
-        // TODO add customizer?
-
-        return builder.build();
-    }
     @Bean
     @ConditionalOnMissingBean
     public DataSource getDataSource()  {
