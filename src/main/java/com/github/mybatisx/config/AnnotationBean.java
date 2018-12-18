@@ -1,6 +1,7 @@
 package com.github.mybatisx.config;
 
 import com.github.mybatisx.annotation.WebxReference;
+import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.sdk.Sdk;
 import com.github.mybatisx.util.SpringUtils;
 import com.github.mybatisx.util.WebxReferenceUtil;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -49,9 +51,17 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 
-        if (beanName.toLowerCase().contains("test")) {
+        if (beanName.toLowerCase().contains("userservice")) {
             String mm = "";
         }
+
+      var webxService=  AnnotationUtils.findAnnotation(bean.getClass(), WebxService.class);
+
+        if(webxService!=null){
+
+
+        }
+
         Field[] fields = bean.getClass().getDeclaredFields();
         for (Field field : fields) {
             try {
