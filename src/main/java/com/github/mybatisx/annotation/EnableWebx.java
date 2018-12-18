@@ -20,7 +20,7 @@ import java.lang.annotation.*;
 @Documented
 @Inherited //
 @ImportAutoConfiguration({SpringUtils.class, WebxConfig.class,  FeignHandler.class, Sdk.class, AnnotationBean.class, WebxMvcConfigurationSupport.class})
-@Import({WebxServiceScanner.class})
+@Import({WebxServiceScanner.class,AnnotationBean.class})
 public @interface EnableWebx {
     @AliasFor("webxServiceScan")
     String[] value() default {};

@@ -1,6 +1,7 @@
 package com.github.mybatisx.config;
 
 import com.github.mybatisx.annotation.WebxReference;
+import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.sdk.Sdk;
 import com.github.mybatisx.util.SpringUtils;
 import com.github.mybatisx.util.WebxReferenceUtil;
@@ -21,10 +22,10 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 
 @Component
-@Order(Integer.MAX_VALUE-20)
+@Order(Integer.MAX_VALUE - 20)
 public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor, BeanPostProcessor, ApplicationContextAware, EnvironmentAware {
-   // @Autowired
-   // private Sdk sdk;
+    // @Autowired
+    // private Sdk sdk;
 
     //    public AnnotationBean(Sdk sdk){
 //        this.sdk=sdk;
@@ -82,13 +83,14 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
     private Object refer(WebxReference reference, Class<?> referenceClass) { //method.getParameterTypes()[0]
 
 
-        var version= reference.value();
-        if(version.startsWith("${") && version.endsWith("}")){
-            var  envKey=version.substring(2,version.length()-1);
-            version= env.getProperty(envKey,"");
-        }
+//        var version= reference.value();
+//        if(version.startsWith("${") && version.endsWith("}")){
+//            var  envKey=version.substring(2,version.length()-1);
+//            version= env.getProperty(envKey,"");
+//        }
 
-        WebxReferenceUtil.add(referenceClass.getPackageName(),version);
+
+       // WebxReferenceUtil.add(referenceClass.getPackageName(), version);
 
         // var key= referenceClass.getPackageName() + ":" + reference.version();
         // ReferenceBean<?> referenceConfig = referenceConfigs.get(key);
@@ -100,16 +102,15 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
         // referenceConfig = referenceConfigs.get(key);
         // return referenceConfig.get();
         //var sdk = SpringUtils.getBean(Sdk.class);
-        var sdk=  ctx.getBean(Sdk.class);
+        var sdk = ctx.getBean(Sdk.class);
         var obj = sdk.getHandler(referenceClass);
-
-        return null;
-     //   return obj;
+        return obj;
     }
 
-   private Environment env;
+    private Environment env;
+
     @Override
     public void setEnvironment(Environment environment) {
-        env= environment;
+        env = environment;
     }
 }

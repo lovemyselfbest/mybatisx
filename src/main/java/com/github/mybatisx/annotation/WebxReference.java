@@ -9,8 +9,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface WebxReference {
-    @AliasFor("version")
-    String value() default "";
-    @AliasFor("value")
-    String version() default "";
+//    @AliasFor("version")
+//    String value() default "";
+//    @AliasFor("value")
+//    String version() default "";
 }
