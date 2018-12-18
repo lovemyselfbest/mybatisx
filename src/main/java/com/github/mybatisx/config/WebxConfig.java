@@ -1,5 +1,7 @@
 package com.github.mybatisx.config;
 
+import com.github.mybatisx.webx.register.WebxServiceImplScanner;
+import com.google.common.collect.Lists;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.zookeeper.discovery.ZookeeperDiscoveryProperties;
 import org.springframework.cloud.zookeeper.discovery.ZookeeperInstance;
@@ -12,6 +14,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 public class WebxConfig  implements EnvironmentAware {
 
 
@@ -20,7 +24,17 @@ public class WebxConfig  implements EnvironmentAware {
 
         return  new  RestTemplate();
     }
+@Bean
+@ConditionalOnMissingBean(WebxServiceImplScanner.class)
+public WebxServiceImplScanner webxServiceImplScanner(){
 
+    List<String> packages= Lists.newArrayList("**.webxservice.impl.**");
+    var scanner = new WebxServiceImplScanner();
+    scanner.setPackages(packages);
+
+    return  scanner;
+
+}
 
 
     @Bean

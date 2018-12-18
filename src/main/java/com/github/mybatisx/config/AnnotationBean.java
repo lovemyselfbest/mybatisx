@@ -81,6 +81,7 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
 
     private Object refer(WebxReference reference, Class<?> referenceClass) { //method.getParameterTypes()[0]
 
+
         var version= reference.value();
         if(version.startsWith("${") && version.endsWith("}")){
             var  envKey=version.substring(2,version.length()-1);
@@ -101,7 +102,9 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
         //var sdk = SpringUtils.getBean(Sdk.class);
         var sdk=  ctx.getBean(Sdk.class);
         var obj = sdk.getHandler(referenceClass);
-        return obj;
+
+        return null;
+     //   return obj;
     }
 
    private Environment env;
