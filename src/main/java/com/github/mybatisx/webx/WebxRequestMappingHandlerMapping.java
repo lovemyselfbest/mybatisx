@@ -16,10 +16,13 @@ import java.lang.reflect.Method;
 public class WebxRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
     @Override
     protected boolean isHandler(Class<?> beanType) {
-        if(beanType.getName().contains("com.github.mybatisx.dao")){
+        if(beanType.getName().toLowerCase().contains("userserviceimpl")){
 
             String mm="";
         }
+if(beanType.isInterface()!= true)
+    return  false;
+
         return (AnnotationUtils.findAnnotation(beanType, WebxService.class) != null);
     }
 
