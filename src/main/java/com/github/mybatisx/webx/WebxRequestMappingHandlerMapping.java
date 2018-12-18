@@ -16,26 +16,26 @@ import java.lang.reflect.Method;
 public class WebxRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
     @Override
     protected boolean isHandler(Class<?> beanType) {
-        if(beanType.getName().toLowerCase().contains("userserviceimpl")){
+        if (beanType.getName().toLowerCase().contains("userserviceimpl")) {
 
-            String mm="";
+            String mm = "";
         }
-if(beanType.isInterface()!= true)
-    return  false;
+        if (beanType.isInterface() != true)
+            return false;
 
         return (AnnotationUtils.findAnnotation(beanType, WebxService.class) != null);
     }
 
-    protected RequestMappingInfo createRequestMappingInfo(Method method, Class<?> handlerType,WebxRequestMapping annotation,
+    protected RequestMappingInfo createRequestMappingInfo(Method method, Class<?> handlerType, WebxRequestMapping annotation,
                                                           RequestCondition<?> customCondition) {
 
-      var paths=annotation.value();
+        var paths = annotation.value();
 
-      if(paths.length==0){
-          var sb = new StringBuilder();
-          sb.append(StringUtils.substringAfterLast(handlerType.getName(),"."));
-          sb.append("/");
-          sb.append(method.getName());
+        if (paths.length == 0) {
+            var sb = new StringBuilder();
+            sb.append(StringUtils.substringAfterLast(handlerType.getName(), "."));
+            sb.append("/");
+            sb.append(method.getName());
 
 
 //          for(var par : method.getParameterTypes()){
@@ -45,14 +45,14 @@ if(beanType.isInterface()!= true)
 //
 //          }
 
-          var path=  sb.toString().toLowerCase();
+            var path = sb.toString().toLowerCase();
 
-          paths= new String[]{path};
-      }
+            paths = new String[]{path};
+        }
 
-      var methods= annotation.method();
-      if(methods.length==0)
-      methods= new RequestMethod[]{ RequestMethod.POST};
+        var methods = annotation.method();
+        if (methods.length == 0)
+            methods = new RequestMethod[]{RequestMethod.POST};
 
         String[] patterns = resolveEmbeddedValuesInPatterns(paths);
 
@@ -71,7 +71,7 @@ if(beanType.isInterface()!= true)
         var methodAnnotation = AnnotationUtils.findAnnotation(method, WebxRequestMapping.class);
         if (methodAnnotation != null) {
             RequestCondition<?> methodCondition = getCustomMethodCondition(method);
-            info = createRequestMappingInfo(method,handlerType,methodAnnotation, methodCondition);
+            info = createRequestMappingInfo(method, handlerType, methodAnnotation, methodCondition);
             RequestMapping typeAnnotation = AnnotationUtils.findAnnotation(handlerType, RequestMapping.class);
             if (typeAnnotation != null) {
                 RequestCondition<?> typeCondition = getCustomTypeCondition(handlerType);

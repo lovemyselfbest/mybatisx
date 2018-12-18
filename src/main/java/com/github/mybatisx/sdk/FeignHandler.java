@@ -57,15 +57,17 @@ public class FeignHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
 
+        var dao = method.getDeclaringClass();
+        String version = "";
+        var webxService = dao.getAnnotation(WebxService.class);
+        if (webxService != null) {
+            version = env.getProperty(webxService.value() + ".version", "");
+        }
 
-       var dao = method.getDeclaringClass();
-        var pkName = dao.getPackageName();
-       var version= WebxReferenceUtil.getValue(pkName);
-       // var version = env.getProperty(pkName.toLowerCase(), "");
         if (StringUtils.isEmpty(version)) {
             throw new IllegalArgumentException(StringUtils.join("包名：", "pkName ", "没有配置版本号"));
         }
-        var webx = dao.getAnnotation(WebxService.class);
+
 
         MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
         int i = 1;
@@ -74,13 +76,16 @@ public class FeignHandler implements InvocationHandler {
             i++;
         }
 
-        var servicePath = String.join("/", webx.value(), version);
+        var servicePath = String.join("/", webxService.value(), version);
 
 
         var MD = FireFactory.getFactory().getMD(method);
-
-        var uri = MD.getDaoClass().getSimpleName().toLowerCase() + "/" + MD.getMethod().getName() + "?city=sz";
-
+if(MD==null){
+    FireFactory.getFactory().setMD(method,method.getDeclaringClass());
+    MD = FireFactory.getFactory().getMD(method);
+}
+        var uri = MD.getDaoClass().getSimpleName() + "/" + MD.getMethod().getName() + "?city=sz";
+uri = uri.toLowerCase();
         var params = new HttpEntity<MultiValueMap<String, Object>>(postParameters, headers);
 
         var json = "";
