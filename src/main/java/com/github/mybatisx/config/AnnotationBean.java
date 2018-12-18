@@ -1,10 +1,14 @@
 package com.github.mybatisx.config;
 
 import com.github.mybatisx.annotation.WebxReference;
+import com.github.mybatisx.annotation.WebxRequestMapping;
 import com.github.mybatisx.annotation.WebxService;
+import com.github.mybatisx.cache.FireFactory;
 import com.github.mybatisx.sdk.Sdk;
 import com.github.mybatisx.util.SpringUtils;
 import com.github.mybatisx.util.WebxReferenceUtil;
+import com.github.mybatisx.webx.register.RefrenceAnnotationFactoryBean;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.bouncycastle.cms.PasswordRecipientId;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -53,6 +57,28 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
 
         if (beanName.toLowerCase().contains("userservice")) {
             String mm = "";
+        }
+
+        if(bean instanceof RefrenceAnnotationFactoryBean){
+            try {
+                var obj = ((RefrenceAnnotationFactoryBean) bean).getObject();
+
+                var ms= obj.getClass().getMethods();
+                for(var m : ms){
+
+                    var webxRequestMapping= AnnotationUtils.findAnnotation(m, WebxRequestMapping.class);
+                    if(webxRequestMapping!=null){
+
+                       var md= FireFactory.getFactory().setMD(m,obj.getClass());
+                        String mm="";
+                    }
+                }
+
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
       var webxService=  AnnotationUtils.findAnnotation(bean.getClass(), WebxService.class);
