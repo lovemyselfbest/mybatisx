@@ -99,6 +99,16 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
                     Object value = refer(reference, field.getType());
                     if (value != null) {
                         field.set(bean, value);
+                        var ms= field.getType().getMethods();
+                        for(var m : ms){
+
+                            var webxRequestMapping= AnnotationUtils.findAnnotation(m, WebxRequestMapping.class);
+                            if(webxRequestMapping!=null){
+
+                                var md= FireFactory.getFactory().setMD(m,value.getClass());
+                                String mm="";
+                            }
+                        }
                     }
                 }
             } catch (Throwable e) {

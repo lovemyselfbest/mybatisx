@@ -206,6 +206,9 @@ public class MethodDescriptor {
     @Getter@Setter
    private Class<?> modelClazz;
 
+    @Getter@Setter
+    private String url;
+
     public List<Annotation> getAnnotations() {
        var annotations = new ArrayList<Annotation>();
 

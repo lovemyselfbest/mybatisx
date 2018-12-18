@@ -27,12 +27,13 @@ import java.lang.reflect.Method;
 
 
 @Component
-@Order(Integer.MAX_VALUE-1)
+@Order(Integer.MAX_VALUE - 1)
 public class FeignHandler implements InvocationHandler {
 
-    public FeignHandler(){
+    public FeignHandler() {
         System.out.println("66");
     }
+
     private static HttpHeaders headers;
 
     static {
@@ -80,12 +81,18 @@ public class FeignHandler implements InvocationHandler {
 
 
         var MD = FireFactory.getFactory().getMD(method);
-if(MD==null){
-    FireFactory.getFactory().setMD(method,method.getDeclaringClass());
-    MD = FireFactory.getFactory().getMD(method);
-}
-        var uri = MD.getDaoClass().getSimpleName() + "/" + MD.getMethod().getName() + "?city=sz";
-uri = uri.toLowerCase();
+
+        var clazz0 = MD.getDaoClass();
+        if (!clazz0.isInterface()) {
+
+            var faces = clazz0.getInterfaces();
+            if (faces.length > 0) {
+                clazz0 = faces[0];
+            }
+
+        }
+        var uri = clazz0.getSimpleName() + "/" + MD.getMethod().getName() + "?city=sz";
+        uri = uri.toLowerCase();
         var params = new HttpEntity<MultiValueMap<String, Object>>(postParameters, headers);
 
         var json = "";
