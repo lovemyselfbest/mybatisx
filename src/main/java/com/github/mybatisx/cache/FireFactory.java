@@ -2,16 +2,11 @@ package com.github.mybatisx.cache;
 
 
 import com.github.mybatisx.annotation.CacheBy;
-import com.github.mybatisx.annotation.Sharding;
-import com.github.mybatisx.annotation.db;
 import com.github.mybatisx.base.QueryBase;
 import com.github.mybatisx.descriptor.MethodDescriptor;
 import com.github.mybatisx.descriptor.MethodUtil;
-import com.github.mybatisx.sharding.DatabaseShardingStrategy;
 import com.github.mybatisx.util.MetaUtil;
 import com.github.mybatisx.util.TypeResolver;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
