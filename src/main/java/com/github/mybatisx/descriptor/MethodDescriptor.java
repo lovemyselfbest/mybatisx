@@ -2,7 +2,6 @@ package com.github.mybatisx.descriptor;
 
 import com.github.mybatisx.annotation.CacheBy;
 import com.github.mybatisx.annotation.Sharding;
-import com.github.mybatisx.annotation.db;
 import com.github.mybatisx.base.QueryBase;
 import com.github.mybatisx.sharding.DatabaseShardingStrategy;
 import com.github.mybatisx.util.MetaUtil;
@@ -110,12 +109,12 @@ public class MethodDescriptor {
     private final String defaultdb = "order_sz";
 
     public String getDataSourceFactoryName()  {
-        var dbAnno = getAnnotation(db.class);
-        if (dbAnno == null) {
-            return  "order_sz";
-        }
-        return dbAnno.value();
-
+//        var dbAnno = getAnnotation(db.class);
+//        if (dbAnno == null) {
+//            return  "order_sz";
+//        }
+//        return dbAnno.value();
+return "";
     }
 
     @Nullable

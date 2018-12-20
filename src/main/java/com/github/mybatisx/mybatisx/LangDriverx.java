@@ -1,9 +1,11 @@
 package com.github.mybatisx.mybatisx;
 
 import com.github.mybatisx.annotation.Column;
+import com.github.mybatisx.annotation.ID;
 import com.github.mybatisx.annotation.Ignore;
-import com.github.mybatisx.annotation.PK;
+
 import com.github.mybatisx.annotation.Table;
+import com.github.mybatisx.base.QueryBase;
 import com.github.mybatisx.cache.FireFactory;
 import com.github.mybatisx.descriptor.MethodUtil;
 import com.github.mybatisx.util.MetaUtil;
@@ -21,6 +23,7 @@ import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
+import javax.sound.midi.Track;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -48,13 +51,32 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
         return new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);
     }
 
-    private void checkAutoSqlGenerator(Class<?> parameterType) {
+    private void checkAutoSqlGenerator(Class<?> modelClazz) {
 
-        if (parameterType == MapperMethod.ParamMap.class)
+        if (modelClazz == MapperMethod.ParamMap.class)
             throw new IllegalArgumentException("参数不对");
+
+        var fields = MetaUtil.getAllFields2(modelClazz);
+
+        if(QueryBase.class.isAssignableFrom(modelClazz))
+            return;
+
+
+        Field field_ID = null;
+        for (Field field : fields) {
+            var id = field.getAnnotation(ID.class);
+            if (id != null) {
+                field_ID = field;
+                break;
+            }
+        }
+        if (field_ID == null)
+            throw new IllegalArgumentException(String.format("table %s have not primary key", modelClazz.getName()));
 
 
     }
+
+
 
     /**
      * 实现自定义Update注解
@@ -71,21 +93,20 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
         Class<?> mapperClass = MybatisxMapperRegistry.getCurrentMapper();
 
 
-
-        Method method= MybatisxMapperAnnotationBuilder.getCurrentMethod();
-
-
-      var MD=  FireFactory.getFactory().setMD(method,mapperClass);
+        Method method = MybatisxMapperAnnotationBuilder.getCurrentMethod();
 
 
-      if(parameterType != MapperMethod.ParamMap.class){
+        var MD = FireFactory.getFactory().setMD(method, mapperClass);
 
-      }
+
+        if (parameterType != MapperMethod.ParamMap.class) {
+
+        }
 
 
         switch (script) {
             case SQL.Update:
-                parameterType= MD.getParameterDescriptors().get(0).getRawType();
+                parameterType = MD.getParameterDescriptors().get(0).getRawType();
                 checkAutoSqlGenerator(parameterType);
 
                 var table = parameterType.getAnnotation(Table.class);
@@ -106,9 +127,9 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
 
                 for (Field field : fields) {
 
-                    var pk1 = field.getAnnotation(PK.class);
+                    var id = field.getAnnotation(ID.class);
 
-                    if (pk1 != null) {
+                    if (id != null) {
                         pk = field;
                         pkFieldName = field.getName();
                         pkName = pkFieldName;
@@ -149,7 +170,7 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
                 script = "<script>" + sb.toString() + "</script>";
                 break;
             case SQL.Insert:
-                parameterType= MD.getParameterDescriptors().get(0).getRawType();
+                parameterType = MD.getParameterDescriptors().get(0).getRawType();
                 checkAutoSqlGenerator(parameterType);
 
                 table = parameterType.getAnnotation(Table.class);
@@ -164,37 +185,28 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
                 sb.append(" insert into  ");
                 sb.append(table.value());
 
+                //
 
-                pk = null;
-                pkName = "";
-                pkFieldName = "";
-                boolean isAutoIncrement = false;
-                for (Field field : fields) {
-
-                    var pk1 = field.getAnnotation(PK.class);
-
-                    if (pk1 != null) {
-                        pk = field;
-                        pkFieldName = field.getName();
-                        pkName = pkFieldName;
-                        isAutoIncrement = pk1.autoIncrement();
-                        var column = field.getAnnotation(Column.class);
-                        if (column != null) {
-                            pkName = column.value();
-                        }
-                    }
-
-                }
-                if (pk == null)
-                    throw new IllegalArgumentException("参数不对3");
-
-
+                ID idAnno=null;
+                String idName="";
                 for (Field field : fields) {
                     // 排除被Ignore修饰的变量
                     if (!field.isAnnotationPresent(Ignore.class)) {
 
-                        if (isAutoIncrement)
-                            continue;
+                       var idAnno2 = field.getAnnotation(ID.class);
+
+                        if(idAnno2 !=null){
+                            idAnno=idAnno2;
+                            idName= field.getName();
+                            var columnID = field.getAnnotation(Column.class);
+                            if (columnID != null){
+                                idName= columnID.value();
+                            }
+                            if(idAnno.autoGenerateId()==true)
+                                continue;
+                        }
+
+
 
 
                         var columnName = field.getName();
@@ -203,6 +215,7 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
 
                         if (columnAnna != null)
                             dbColumnName = columnAnna.value();
+
                         tmp1.append(dbColumnName + ",");
                         tmp2.append("#{" + columnName + "},");
 
@@ -212,11 +225,16 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
                 tmp2.deleteCharAt(tmp2.lastIndexOf(","));
                 sb.append(String.format("(%s) values (%s)", tmp1, tmp2));
 
+                if(idAnno.autoGenerateId()==true){
+                    sb.append(String.format("; select @@identity as `%s`",idName));
+                }else{
+                    sb.append(String.format("; select LAST_INSERT_ID() as `%s`",idName));
+                }
                 script = "<script>" + sb.toString() + "</script>";
 
                 break;
             case SQL.Select:
-                parameterType= MD.getParameterDescriptors().get(0).getRawType();
+                parameterType = MD.getParameterDescriptors().get(0).getRawType();
                 checkAutoSqlGenerator(parameterType);
 
                 sb = new StringBuilder();
@@ -299,42 +317,42 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
 
         Matcher m = p.matcher(script);
 
-        var maps = new HashMap<Integer,String>();
-        int i=1;
+        var maps = new HashMap<Integer, String>();
+        int i = 1;
         while (m.find()) {
             //script = matcher.replaceAll(sb.toString());
-            maps.putIfAbsent(i,m.group());
+            maps.putIfAbsent(i, m.group());
             i++;
         }
 
-       var IsParMap= parameterType == MapperMethod.ParamMap.class;
+        var IsParMap = parameterType == MapperMethod.ParamMap.class;
 
 
-        for (Map.Entry<Integer,String> entry : maps.entrySet()){
+        for (Map.Entry<Integer, String> entry : maps.entrySet()) {
 
-            var k= entry.getKey();
-            var v= entry.getValue();
-            var vHou="";
-            var vQian="";
-            if(v.contains(".")){
-                var vArray= v.split("\\.");
+            var k = entry.getKey();
+            var v = entry.getValue();
+            var vHou = "";
+            var vQian = "";
+            if (v.contains(".")) {
+                var vArray = v.split("\\.");
 
-                if(IsParMap){
-                    vHou="."+vArray[1];
-                }else{
-                    vHou=vArray[1];
+                if (IsParMap) {
+                    vHou = "." + vArray[1];
+                } else {
+                    vHou = vArray[1];
                 }
             }
-            if(IsParMap)
-                vQian="param";
+            if (IsParMap)
+                vQian = "param";
 
-            var num= k.toString();
-            if(IsParMap==false){
-                num="";
+            var num = k.toString();
+            if (IsParMap == false) {
+                num = "";
             }
 
-            var newV= String.format("#{%s%s%s}",vQian,num,vHou);
-            script=  script.replace(v,newV);
+            var newV = String.format("#{%s%s%s}", vQian, num, vHou);
+            script = script.replace(v, newV);
 
         }
 
