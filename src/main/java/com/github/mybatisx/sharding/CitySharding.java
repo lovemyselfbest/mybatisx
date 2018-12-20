@@ -8,14 +8,19 @@ public class CitySharding implements DatabaseShardingStrategy {
     @Override
     public String getDataSourceFactoryName(Object shardingParameter) {
 
+        try {
+            var request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        var request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            var city = request.getParameter("city");
 
-        var city= request.getParameter("city");
 
-        if(StringUtils.isEmpty(city))
-            throw  new IllegalArgumentException("");
+            if (StringUtils.isEmpty(city))
+                throw new IllegalArgumentException("");
 
-        return "order_"+city;
+            return "order_" + city;
+        } catch (Exception ex) {
+
+        }
+        return "order_sz";
     }
 }

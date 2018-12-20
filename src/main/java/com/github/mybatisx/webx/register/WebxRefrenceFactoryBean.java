@@ -2,11 +2,11 @@ package com.github.mybatisx.webx.register;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class RefrenceAnnotationFactoryBean<T> implements FactoryBean<T> {
+public class WebxRefrenceFactoryBean<T> implements FactoryBean<T> {
 
-    public RefrenceAnnotationFactoryBean(){}
+    public WebxRefrenceFactoryBean(){}
 
-    public RefrenceAnnotationFactoryBean(Class<T> mapperInterface) {
+    public WebxRefrenceFactoryBean(Class<T> mapperInterface) {
         this.interfaceClazz = mapperInterface;
     }
     @Override

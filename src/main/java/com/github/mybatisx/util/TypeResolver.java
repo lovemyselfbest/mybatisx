@@ -99,6 +99,8 @@ public class TypeResolver {
             return  "";
         } else if (clazz == float.class) {
             return Float.valueOf(value).floatValue();
+        }else if (clazz == long.class) {
+            return  Long.parseLong(value);
         }else if (clazz == Long.class) {
             return  Long.valueOf(value);
         } else if (clazz == Integer.class) {

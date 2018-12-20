@@ -1,4 +1,4 @@
-package com.github.mybatisx.mybatis;
+package com.github.mybatisx.mybatisx;
 
 import com.github.mybatisx.annotation.Column;
 import com.github.mybatisx.annotation.Ignore;

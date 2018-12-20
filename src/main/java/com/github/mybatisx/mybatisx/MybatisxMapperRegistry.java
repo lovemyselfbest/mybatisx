@@ -1,4 +1,4 @@
-package com.github.mybatisx.mybatis;
+package com.github.mybatisx.mybatisx;
 
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.binding.MapperProxyFactory;

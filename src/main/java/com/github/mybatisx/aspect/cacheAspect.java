@@ -4,7 +4,7 @@ import com.github.mybatisx.base.QueryBase;
 import com.github.mybatisx.cache.CacheableOperator;
 import com.github.mybatisx.cache.FireFactory;
 import com.github.mybatisx.config.DataSourceContextHolder;
-import com.github.mybatisx.mybatis.PageUtil;
+import com.github.mybatisx.mybatisx.PageUtil;
 import com.github.pagehelper.Page;
 
 import lombok.SneakyThrows;
@@ -52,9 +52,9 @@ public class cacheAspect {
         //获得目标方法标签里的值
         Method method = methodSignature.getMethod();
 
-        var methodDescriptor = FireFactory.getFactory().getMD(method);
+        var MD = FireFactory.getFactory().getMD(method);
 
-        var sharding =methodDescriptor.getShardingAnno();
+        var sharding =MD.getShardingAnno();
         var  dbKey= sharding.getDataSourceFactoryName(null);
 
         DataSourceContextHolder.setDBKey(dbKey);
@@ -83,16 +83,16 @@ public class cacheAspect {
         }
 
         Object v= null;
-        if (methodDescriptor.isUseCache() == false) {
+        if (MD.isUseCache() == false) {
 
             v= point.proceed(args);
         }
-        else if (!isPaging || !IsOnlyCache(args[0], methodDescriptor.getQueryCacheField())) {
+        else if (!isPaging || !IsOnlyCache(args[0], MD.getQueryCacheField())) {
             v= point.proceed(args);
         } else {
             //处理缓存
 
-            var operator = new CacheableOperator(point, methodDescriptor);
+            var operator = new CacheableOperator(point, MD);
 
             v = operator.invoke();
 

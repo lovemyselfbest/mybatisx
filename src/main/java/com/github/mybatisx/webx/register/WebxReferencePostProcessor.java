@@ -1,4 +1,4 @@
-package com.github.mybatisx.config;
+package com.github.mybatisx.webx.register;
 
 import com.github.mybatisx.annotation.WebxReference;
 import com.github.mybatisx.annotation.WebxRequestMapping;
@@ -25,16 +25,14 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Component
-@Order(Integer.MAX_VALUE - 20)
-public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor, BeanPostProcessor, ApplicationContextAware, EnvironmentAware {
-    // @Autowired
-    // private Sdk sdk;
 
-    //    public AnnotationBean(Sdk sdk){
-//        this.sdk=sdk;
-//    }
+public class WebxReferencePostProcessor implements DisposableBean, BeanFactoryPostProcessor, BeanPostProcessor, ApplicationContextAware, EnvironmentAware {
+
     @Override
     public void destroy() throws Exception {
 
@@ -58,43 +56,59 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
         if (beanName.toLowerCase().contains("userservice")) {
             String mm = "";
         }
-
-        if(bean instanceof RefrenceAnnotationFactoryBean){
-            try {
-                var obj = ((RefrenceAnnotationFactoryBean) bean).getObject();
-
-                var ms= obj.getClass().getMethods();
-                for(var m : ms){
-
-                    var webxRequestMapping= AnnotationUtils.findAnnotation(m, WebxRequestMapping.class);
-                    if(webxRequestMapping!=null){
-
-                       var md= FireFactory.getFactory().setMD(m,obj.getClass());
-                        String mm="";
-                    }
-                }
-
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-      var webxService=  AnnotationUtils.findAnnotation(bean.getClass(), WebxService.class);
-
-        if(webxService!=null){
-
-
-        }
-
+//
+//        Set<Class<?>> faceSet = new LinkedHashSet<>();
+//
+//        if(bean instanceof RefrenceAnnotationFactoryBean){
+//
+//            var clazz0 = ((RefrenceAnnotationFactoryBean) bean).getObjectType();
+//            faceSet.add(clazz0);
+//        }
+//
+//      var webxService=  AnnotationUtils.findAnnotation(bean.getClass(), WebxService.class);
+//
+//        if(webxService!=null){
+//
+//
+//            var clazz= bean.getClass();
+//
+//            if(clazz.isInterface()){
+//                faceSet.add(clazz);
+//            }
+//
+//             if(!clazz.isInterface()){
+//
+//                var faces= clazz.getInterfaces();
+//                for (var face:faces){
+//
+//                    faceSet.add(face);
+//                }
+//
+//            }
+//        }
+//        for (var faceClazz:faceSet){
+//
+//            var anno= faceClazz.getAnnotation(WebxService.class);
+//            if(anno!=null){
+//                var ms= faceClazz.getMethods();
+//                for(var m : ms){
+//
+//                    var webxRequestMapping= AnnotationUtils.findAnnotation(m, WebxRequestMapping.class);
+//                    if(webxRequestMapping!=null){
+//                        var md= FireFactory.getFactory().setMD(m,faceClazz);
+//                        String mm="";
+//                    }
+//                }
+//
+//            }
+//        }
         Field[] fields = bean.getClass().getDeclaredFields();
         for (Field field : fields) {
             try {
                 if (!field.isAccessible()) {
                     field.setAccessible(true);
                 }
-                WebxReference reference = field.getAnnotation(WebxReference.class);
+                var reference = field.getAnnotation(WebxReference.class);
                 if (reference != null) {
                     Object value = refer(reference, field.getType());
                     if (value != null) {
@@ -105,8 +119,8 @@ public class AnnotationBean implements DisposableBean, BeanFactoryPostProcessor,
                             var webxRequestMapping= AnnotationUtils.findAnnotation(m, WebxRequestMapping.class);
                             if(webxRequestMapping!=null){
 
-                                var md= FireFactory.getFactory().setMD(m,value.getClass());
-                                String mm="";
+                                 FireFactory.getFactory().setMD(m,value.getClass());
+
                             }
                         }
                     }

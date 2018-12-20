@@ -48,6 +48,12 @@ public class FireFactory {
 
     public MethodDescriptor getMD(Method method){
         var MD = fireLineMap.get(method);
+        if(MD==null){
+var clazz=method.getDeclaringClass();
+            MD= setMD(method,clazz);
+            System.out.println("运行时获取MD，"+ method.getName()+"  "+method.getDeclaringClass().getName());
+
+        }
             return MD;
 
 

@@ -30,7 +30,7 @@ public class AnnotationScanner  extends ClassPathBeanDefinitionScanner {
             //RefrenceAnnotationFactoryBean 实现了FactoryBean
 
             definition.getConstructorArgumentValues().addGenericArgumentValue(definition.getBeanClassName());
-           definition.setBeanClass(RefrenceAnnotationFactoryBean.class);
+           definition.setBeanClass(WebxRefrenceFactoryBean.class);
 
            //var mutablePropertyValues= definition.getPropertyValues();
            //mutablePropertyValues.add("interfaceClazz",holder.getSource());

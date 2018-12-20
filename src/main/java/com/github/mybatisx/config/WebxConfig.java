@@ -1,5 +1,6 @@
 package com.github.mybatisx.config;
 
+
 import com.github.mybatisx.webx.register.WebxServiceImplScanner;
 import com.google.common.collect.Lists;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -28,7 +29,8 @@ public class WebxConfig  implements EnvironmentAware {
 @ConditionalOnMissingBean(WebxServiceImplScanner.class)
 public WebxServiceImplScanner webxServiceImplScanner(){
 
-    List<String> packages= Lists.newArrayList("**.webxservice.impl.**");
+    List<String> packages= Lists.newArrayList("**.implement.**");
+
     var scanner = new WebxServiceImplScanner();
     scanner.setPackages(packages);
 

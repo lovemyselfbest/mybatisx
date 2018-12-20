@@ -20,8 +20,7 @@ public class WebxRequestMappingHandlerMapping extends RequestMappingHandlerMappi
 
             String mm = "";
         }
-        if (beanType.isInterface() != true)
-            return false;
+
 
         return (AnnotationUtils.findAnnotation(beanType, WebxService.class) != null);
     }
@@ -33,17 +32,23 @@ public class WebxRequestMappingHandlerMapping extends RequestMappingHandlerMappi
 
         if (paths.length == 0) {
             var sb = new StringBuilder();
-            sb.append(StringUtils.substringAfterLast(handlerType.getName(), "."));
+
+            var handlerClazz= handlerType;
+            if(!handlerClazz.isInterface()){
+
+               var faces= handlerClazz.getInterfaces();
+               for(var face :faces){
+                   var webxService = face.getAnnotation(WebxService.class);
+                   if(webxService!=null){
+                       handlerClazz=face;
+                       break;
+                   }
+               }
+            }
+            sb.append(StringUtils.substringAfterLast(handlerClazz.getName(), "."));
             sb.append("/");
             sb.append(method.getName());
 
-
-//          for(var par : method.getParameterTypes()){
-//
-//              sb.append("/");
-//              sb.append(StringUtils.substringAfterLast(par.getName(),"."));
-//
-//          }
 
             var path = sb.toString().toLowerCase();
 

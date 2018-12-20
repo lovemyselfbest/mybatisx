@@ -3,13 +3,17 @@ package com.github.mybatisx.config;
 import com.github.mybatisx.annotation.EnableMybatisX;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.mapper.ClassPathMapperScanner;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
@@ -17,6 +21,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+
 
 public class MapperScannerRegistrar3 implements ImportBeanDefinitionRegistrar, EnvironmentAware, BeanClassLoaderAware, ResourceLoaderAware {
 
@@ -30,8 +35,10 @@ public class MapperScannerRegistrar3 implements ImportBeanDefinitionRegistrar, E
         if (resourceLoader != null) {
             scanner.setResourceLoader(resourceLoader);
         }
+        scanner.setAnnotationClass(Mapper.class);
         scanner.registerFilters();
         var scans= new String[packagesToScan.size()];
+
         scanner.doScan(packagesToScan.toArray(scans));
 
 
