@@ -2,17 +2,10 @@ package com.github.mybatisx.webx.register;
 
 import com.github.mybatisx.annotation.WebxReference;
 import com.github.mybatisx.annotation.WebxRequestMapping;
-import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.cache.FireFactory;
 import com.github.mybatisx.sdk.Sdk;
-import com.github.mybatisx.util.SpringUtils;
-import com.github.mybatisx.util.WebxReferenceUtil;
-import com.github.mybatisx.webx.register.RefrenceAnnotationFactoryBean;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.bouncycastle.cms.PasswordRecipientId;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -20,14 +13,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Proxy;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Component
 
