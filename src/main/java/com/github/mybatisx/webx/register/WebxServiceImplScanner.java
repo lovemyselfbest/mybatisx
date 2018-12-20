@@ -1,20 +1,16 @@
 package com.github.mybatisx.webx.register;
 
 import com.github.mybatisx.annotation.WebxService;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.ClassMetadata;
-import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
@@ -35,11 +31,11 @@ public class WebxServiceImplScanner implements BeanFactoryPostProcessor {
         for (Class<?> daoClass : findMangoDaoClasses()) {
 
             var interfaces = daoClass.getInterfaces();
-            for (var face : interfaces){
+            for (var face : interfaces) {
 
-                var anno= face.getAnnotation(WebxService.class);
-                if(anno!=null){
-                   //开始注册
+                var anno = face.getAnnotation(WebxService.class);
+                if (anno != null) {
+                    //开始注册
                     GenericBeanDefinition bf = new GenericBeanDefinition();
                     bf.setBeanClassName(daoClass.getName());
                     // MutablePropertyValues pvs = bf.getPropertyValues();
@@ -52,8 +48,6 @@ public class WebxServiceImplScanner implements BeanFactoryPostProcessor {
                     dlbf.registerBeanDefinition(daoClass.getName(), bf);
                     //
                 }
-
-
             }
         }
     }
@@ -68,21 +62,18 @@ public class WebxServiceImplScanner implements BeanFactoryPostProcessor {
                 for (Resource r : rs) {
 
                     MetadataReader reader = metadataReaderFactory.getMetadataReader(r);
-                   // AnnotationMetadata annotationMD = reader.getAnnotationMetadata();
-                   //
-                   // if (annotationMD.hasAnnotation(WebxServiceImpl.class.getName())) {
-                        ClassMetadata clazzMD = reader.getClassMetadata();
+                    // AnnotationMetadata annotationMD = reader.getAnnotationMetadata();
+                    //
+                    // if (annotationMD.hasAnnotation(WebxServiceImpl.class.getName())) {
+                    ClassMetadata clazzMD = reader.getClassMetadata();
 
+                    var clazz = Class.forName(clazzMD.getClassName());
+                    var webxService = AnnotationUtils.findAnnotation(clazz, WebxService.class);
+                    if (webxService != null) {
+                        daos.add(clazz);
+                    }
 
-                            var clazz= Class.forName(clazzMD.getClassName());
-                            var webxService=AnnotationUtils.findAnnotation(clazz,WebxService.class);
-                            if(webxService!=null){
-                                daos.add(clazz);
-                            }
-
-
-
-                   // }
+                    // }
                 }
             }
             return daos;
@@ -95,7 +86,7 @@ public class WebxServiceImplScanner implements BeanFactoryPostProcessor {
         for (String p : packages) {
             for (String daoEnd : DAO_ENDS) {
                 String locationPattern = "classpath*:" + p.replaceAll("\\.", "/") + "/**/*" + daoEnd + ".class";
-              //  logger.info("trnas package[" + p + "] to locationPattern[" + locationPattern + "]");
+                //  logger.info("trnas package[" + p + "] to locationPattern[" + locationPattern + "]");
                 locationPatterns.add(locationPattern);
             }
         }

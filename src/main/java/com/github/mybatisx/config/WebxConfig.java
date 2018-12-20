@@ -4,6 +4,7 @@ package com.github.mybatisx.config;
 import com.github.mybatisx.webx.register.WebxServiceImplScanner;
 import com.google.common.collect.Lists;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.cloud.zookeeper.discovery.ZookeeperDiscoveryProperties;
 import org.springframework.cloud.zookeeper.discovery.ZookeeperInstance;
 import org.springframework.cloud.zookeeper.serviceregistry.ServiceInstanceRegistration;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+@ConditionalOnWebApplication
 public class WebxConfig  implements EnvironmentAware {
 
 
@@ -41,18 +43,30 @@ public WebxServiceImplScanner webxServiceImplScanner(){
 
     @Bean
     @ConditionalOnMissingBean(ZookeeperRegistration.class)
-    public ServiceInstanceRegistration serviceInstanceRegistration(ApplicationContext context, ZookeeperDiscoveryProperties properties) {
-        String appName = context.getEnvironment().getProperty("spring.application.name",
-                "application");
-        String version = context.getEnvironment().getProperty("spring.application.version",
-                "v1");
+    public ServiceInstanceRegistration serviceInstanceRegistration(ApplicationContext ctx, ZookeeperDiscoveryProperties properties) {
+
+        String appName = env.getProperty("spring.application.name","");
+
+        if(StringUtils.isEmpty(appName)){
+            throw new IllegalArgumentException("spring.application.name is not set");
+        }
+
+        var versionName= String.format("%s.version",appName);
+
+        String version = env.getProperty(versionName,"");
+
+        if(StringUtils.isEmpty(version)){
+            throw new IllegalArgumentException(String.format("%s.version is not set",appName));
+        }
+
         appName=String.join("/",appName,version);
+
         String host = properties.getInstanceHost();
         if (!StringUtils.hasText(host)) {
             throw new IllegalStateException("instanceHost must not be empty");
         }
 
-        ZookeeperInstance zookeeperInstance = new ZookeeperInstance(context.getId(),
+        ZookeeperInstance zookeeperInstance = new ZookeeperInstance(ctx.getId(),
                 appName, properties.getMetadata());
         ServiceInstanceRegistration.RegistrationBuilder builder = ServiceInstanceRegistration.builder().address(host)
                 .name(appName).payload(zookeeperInstance)
