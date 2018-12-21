@@ -6,6 +6,8 @@ import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.cache.FireFactory;
 import com.github.mybatisx.sdk.Sdk;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,52 +54,7 @@ public class WebxReferencePostProcessor implements DisposableBean, BeanFactoryPo
         if (beanName.toLowerCase().contains("userservice")) {
             String mm = "";
         }
-//
-//        Set<Class<?>> faceSet = new LinkedHashSet<>();
-//
-//        if(bean instanceof RefrenceAnnotationFactoryBean){
-//
-//            var clazz0 = ((RefrenceAnnotationFactoryBean) bean).getObjectType();
-//            faceSet.add(clazz0);
-//        }
-//
-//      var webxService=  AnnotationUtils.findAnnotation(bean.getClass(), WebxService.class);
-//
-//        if(webxService!=null){
-//
-//
-//            var clazz= bean.getClass();
-//
-//            if(clazz.isInterface()){
-//                faceSet.add(clazz);
-//            }
-//
-//             if(!clazz.isInterface()){
-//
-//                var faces= clazz.getInterfaces();
-//                for (var face:faces){
-//
-//                    faceSet.add(face);
-//                }
-//
-//            }
-//        }
-//        for (var faceClazz:faceSet){
-//
-//            var anno= faceClazz.getAnnotation(WebxService.class);
-//            if(anno!=null){
-//                var ms= faceClazz.getMethods();
-//                for(var m : ms){
-//
-//                    var webxRequestMapping= AnnotationUtils.findAnnotation(m, WebxRequestMapping.class);
-//                    if(webxRequestMapping!=null){
-//                        var md= FireFactory.getFactory().setMD(m,faceClazz);
-//                        String mm="";
-//                    }
-//                }
-//
-//            }
-//        }
+
         Field[] fields = bean.getClass().getDeclaredFields();
         for (Field field : fields) {
             try {
@@ -109,15 +66,14 @@ public class WebxReferencePostProcessor implements DisposableBean, BeanFactoryPo
                     Object value = refer(reference, field.getType());
                     if (value != null) {
                         field.set(bean, value);
-                        var ms= field.getType().getMethods();
+                       // var ms= field.getType().getMethods();
+
+                        var memberType= field.getType();
+
+                       var ms= MethodUtils.getMethodsWithAnnotation(memberType,WebxRequestMapping.class);
                         for(var m : ms){
 
-                            var webxRequestMapping= AnnotationUtils.findAnnotation(m, WebxRequestMapping.class);
-                            if(webxRequestMapping!=null){
-
-                                 FireFactory.getFactory().setMD(m,value.getClass());
-
-                            }
+                            FireFactory.getFactory().setMD(m,memberType);
                         }
                     }
                 }

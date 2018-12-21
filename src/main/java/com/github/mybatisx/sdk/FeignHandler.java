@@ -57,10 +57,10 @@ public class FeignHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
+        var MD = FireFactory.getFactory().getMD(method);
 
-        var dao = method.getDeclaringClass();
         String version = "";
-        var webxService = dao.getAnnotation(WebxService.class);
+        var webxService = MD.getDaoClass().getAnnotation(WebxService.class);
         if (webxService != null) {
             version = env.getProperty(webxService.value() + ".version", "");
         }
@@ -80,7 +80,7 @@ public class FeignHandler implements InvocationHandler {
         var servicePath = String.join("/", webxService.value(), version);
 
 
-        var MD = FireFactory.getFactory().getMD(method);
+
 
         var clazz0 = MD.getDaoClass();
         if (!clazz0.isInterface()) {
