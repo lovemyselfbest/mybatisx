@@ -226,9 +226,9 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
                 sb.append(String.format("(%s) values (%s)", tmp1, tmp2));
 
                 if(idAnno.autoGenerateId()==true){
-                    sb.append(String.format("; select @@identity as `%s`",idName));
+                   // sb.append(String.format("; select 1 as id",idName));
                 }else{
-                    sb.append(String.format("; select LAST_INSERT_ID() as `%s`",idName));
+                  //  sb.append(String.format("; select LAST_INSERT_ID() as `%s`",idName));
                 }
                 script = "<script>" + sb.toString() + "</script>";
 
