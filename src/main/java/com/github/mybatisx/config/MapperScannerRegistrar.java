@@ -1,11 +1,16 @@
 package com.github.mybatisx.config;
 
 import com.github.mybatisx.annotation.EnableMybatisX;
+import com.github.mybatisx.aspect.AspectJExpressionPointcutX;
+import com.github.mybatisx.util.TempUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.mapper.ClassPathMapperScanner;
 import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.context.EnvironmentAware;
@@ -23,7 +28,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 
-public class MapperScannerRegistrar3 implements ImportBeanDefinitionRegistrar, EnvironmentAware, BeanClassLoaderAware, ResourceLoaderAware {
+public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware, BeanClassLoaderAware, ResourceLoaderAware {
 
 
     @Override
@@ -39,9 +44,15 @@ public class MapperScannerRegistrar3 implements ImportBeanDefinitionRegistrar, E
         scanner.registerFilters();
         var scans= new String[packagesToScan.size()];
 
+        TempUtil.daoPackageNames=packagesToScan.toArray(scans);
+
         scanner.doScan(packagesToScan.toArray(scans));
 
+//注册catech代理
+       // BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(AspectJExpressionPointcutX.class);
+       // BeanDefinition beanDefinition = builder.getBeanDefinition();
 
+       // registry.registerBeanDefinition("foo",beanDefinition);
 
 
 

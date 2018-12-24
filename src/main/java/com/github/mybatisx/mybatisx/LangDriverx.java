@@ -99,11 +99,6 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
         var MD = FireFactory.getFactory().setMD(method, mapperClass);
 
 
-        if (parameterType != MapperMethod.ParamMap.class) {
-
-        }
-
-
         switch (script) {
             case SQL.Update:
                 parameterType = MD.getParameterDescriptors().get(0).getRawType();
@@ -320,7 +315,6 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
         var maps = new HashMap<Integer, String>();
         int i = 1;
         while (m.find()) {
-            //script = matcher.replaceAll(sb.toString());
             maps.putIfAbsent(i, m.group());
             i++;
         }

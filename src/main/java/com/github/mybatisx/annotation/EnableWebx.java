@@ -1,7 +1,7 @@
 package com.github.mybatisx.annotation;
 
 
-import com.github.mybatisx.config.WebxConfig;
+import com.github.mybatisx.webx.WebxConfig;
 import com.github.mybatisx.sdk.FeignHandler;
 import com.github.mybatisx.sdk.Sdk;
 import com.github.mybatisx.util.SpringUtils;

@@ -2,10 +2,13 @@ package com.github.mybatisx.cache;
 
 import com.github.mybatisx.descriptor.MethodDescriptor;
 import com.github.mybatisx.util.SpringUtils;
+import lombok.SneakyThrows;
+import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.*;
 
 public class CacheableOperator {
@@ -16,59 +19,79 @@ public class CacheableOperator {
 
     private MethodDescriptor MD;
 
-    private ProceedingJoinPoint point;
+    private MethodInvocation point;
+    private Field hitField;
+    private Object cacheKeyValue;
+    private Object cacheArg;
 
-    public CacheableOperator(ProceedingJoinPoint point, MethodDescriptor md) throws Throwable {
+    @SneakyThrows
+    public CacheableOperator(MethodInvocation point, MethodDescriptor md, Field field) {
 
         this.point = point;
         this.MD = md;
-        this.args = point.getArgs();
-        cacheArg = args[0];
-        cacheActualKeys = FieldUtils.readField(md.getQueryCacheField(),cacheArg, true);
+        hitField = field;
+        cacheArg = point.getArguments()[0];
+        cacheKeyValue = FieldUtils.readField(field, cacheArg, true);
 
     }
 
-    private Object[] args;
-    private Object cacheArg;
 
-    private Object cacheActualKeys;
+    public Object invoke()  {
 
-
-    public Object invoke() throws Throwable {
-
-
-        return multipleKeysCache(MD.getKeyType(), MD.getReturnRawType());
+     return  hitField.getType().isArray()? multipleKeysCache(MD.getKeyType(), MD.getReturnDescriptor().getMappedClass())
+             :singleKeyCache(MD.getReturnDescriptor().getMappedClass());
     }
 
-    private Map<String, Object> getCached(Set<String> keys, Class<?> clazz) {
-        var ret = new HashMap<String, Object>();
-        var redis = getRedisClient();
-        for (String key : keys) {
-            var v = redis.get(key, clazz);
-            if (v != null) {
-                ret.putIfAbsent(key, v);
+    @SneakyThrows
+     private <V> Object singleKeyCache(Class<V> redisValueType){
+
+        var cachePrefix = MD.getCachePrefix();
+
+        var key = String.format("%s%s",cachePrefix,cacheKeyValue);
+
+        var v= CacheUtil.getCached(key,redisValueType);
+
+        var addableObj = new AddableObject<V>(redisValueType);
+
+        if(v!=null){
+            addableObj.add(redisValueType.cast(v));
+        }else{
+
+            Object dbValues = this.point.proceed();
+
+            var redis = SpringUtils.getBean(RedisClient.class);
+
+            for (Object dbItem : new Iterables(dbValues)) {
+                // db数据添加入结果
+
+
+                addableObj.add(redisValueType.cast(dbItem));
+                // 添加入缓存
+
+                Object key2 = FieldUtils.readField(MD.getCacheField(), dbItem, true);
+
+                var keyStr = cachePrefix + key2;
+                redis.set(keyStr, dbItem, MD.getCacheTTL());
+
+
+
             }
         }
 
-        return ret;
-    }
+        return addableObj.getReturn();
+     }
 
-    private RedisClient getRedisClient() {
+@SneakyThrows
+    private <K, V> Object multipleKeysCache(Class<K> keyType, Class<V> redisValueType)  {
 
-        var redis = SpringUtils.getBean(RedisClient.class);
-        return redis;
-    }
-
-    private <K, V> Object multipleKeysCache(Class<K> keyType, Class<V> redisValueType) throws Throwable {
-
-        var iterables = new Iterables(cacheActualKeys);
-        var cachePrefix= MD.getCachePrefix();
+        var iterables = new Iterables(cacheKeyValue);
+        var cachePrefix = MD.getCachePrefix();
         Set<String> keys = new HashSet<>();
         for (Object obj : iterables) {
-            keys.add(cachePrefix+obj);
+            keys.add(cachePrefix + obj);
         }
 
-        var redisResults = getCached(keys, redisValueType);
+        var redisResults = CacheUtil.getCached(keys, redisValueType);
 
         var addableObj = new AddableObject<V>(redisValueType);
 
@@ -80,7 +103,7 @@ public class CacheableOperator {
         var missKeysActual = new HashSet<K>();
 
         for (var key : iterables) {
-var key2=cachePrefix+key;
+            var key2 = cachePrefix + key;
 
             Object value = redisResults != null ? redisResults.get(key2) : null;
             if (value == null) {
@@ -101,12 +124,12 @@ var key2=cachePrefix+key;
 
             K[] keyArray = (K[]) Array.newInstance(keyType, missKeysActual.size());
 
-            var v=missKeysActual.toArray(keyArray);
+            var v = missKeysActual.toArray(keyArray);
 
-            FieldUtils.writeField(MD.getQueryCacheField(),cacheArg,v,true);
+            FieldUtils.writeField(hitField, cacheArg, v, true);
 
-            Object dbValues = this.point.proceed(args);
-            var redis = getRedisClient();
+            Object dbValues = this.point.proceed();
+            var redis = SpringUtils.getBean(RedisClient.class);
 
             // 用于 debug log
             var needSetKeys = new ArrayList<String>();
@@ -118,9 +141,9 @@ var key2=cachePrefix+key;
                 addableObj.add(redisValueType.cast(dbItem));
                 // 添加入缓存
 
-                Object key = FieldUtils.readField(MD.getQueryCacheField(),dbItem,true);
+                Object key = FieldUtils.readField(MD.getCacheField(), dbItem, true);
 
-                var keyStr=cachePrefix+key;
+                var keyStr = cachePrefix + key;
                 redis.set(keyStr, dbItem, MD.getCacheTTL());
 
 
@@ -146,7 +169,7 @@ var key2=cachePrefix+key;
 
         public AddableObject(Class<T> valueClass) {
 
-            var methodReturnType = MD.getReturnRawType();
+            var methodReturnType = MD.getReturnDescriptor().getRawType();
 
             if (methodReturnType.isAssignableFrom(Set.class)) {
 
@@ -173,7 +196,7 @@ var key2=cachePrefix+key;
         }
 
         public Object getReturn() {
-            var methodReturnType =(Class<?>) MD.getReturnType();
+            var methodReturnType = (Class<?>) MD.getReturnDescriptor().getRawType();
             if (methodReturnType.isAssignableFrom(List.class)
                     || methodReturnType.isAssignableFrom(Collection.class)) {
 
@@ -192,13 +215,14 @@ var key2=cachePrefix+key;
             }
         }
 
-        private  <T> Object toArray(List<T> list, Class<T> clazz) {
+        private <T> Object toArray(List<T> list, Class<T> clazz) {
             Object array = Array.newInstance(clazz, list.size());
             for (int i = 0; i < list.size(); i++) {
                 Array.set(array, i, list.get(i));
             }
             return array;
         }
+
         @Override
         public String toString() {
             return hitValueList != null ? hitValueList.toString() : hitValueSet.toString();

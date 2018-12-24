@@ -2,6 +2,7 @@ package com.github.mybatisx.cache;
 
 
 import com.github.mybatisx.annotation.CacheBy;
+import com.github.mybatisx.base.ModelBase;
 import com.github.mybatisx.base.QueryBase;
 import com.github.mybatisx.descriptor.MethodDescriptor;
 import com.github.mybatisx.descriptor.MethodUtil;
@@ -10,7 +11,9 @@ import com.github.mybatisx.util.TypeResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,104 +41,113 @@ public class FireFactory {
     }
 
 
-
     private String defaultdb = "order_sz";
 
-    public MethodDescriptor getMD(Method method){
+    public MethodDescriptor getMD(Method method) {
         var MD = fireLineMap.get(method);
-        if(MD==null){
-var clazz=method.getDeclaringClass();
-            MD= setMD(method,clazz);
-            System.out.println("运行时获取MD，"+ method.getName()+"  "+method.getDeclaringClass().getName());
+        if (MD == null) {
+            var clazz = method.getDeclaringClass();
+            MD = setMD(method, clazz);
+            System.out.println("运行时获取MD，" + method.getName() + "  " + method.getDeclaringClass().getName());
 
         }
-            return MD;
+        return MD;
 
 
     }
 
-    public MethodDescriptor setMD(Method method,Class<?> daoClazz) {
+    public MethodDescriptor setMD(Method method, Class<?> daoClazz) {
 
         var opt = fireLineMap.values().stream().filter(p -> p.getMethod() == method).findFirst();
         if (opt.isPresent())
             return opt.get();
 
 
+        var methodDescriptor = MethodUtil.getMethodDescriptor(daoClazz, method, false);
 
 
+        var parTypes = methodDescriptor.getParameterDescriptors();
 
-        var methodDescriptor = MethodUtil.getMethodDescriptor(daoClazz,method,false);
+        if (parTypes.size() == 1) {
+            var arg0type = parTypes.get(0).getRawType();
 
-        //methodDescriptor.isUseCache();
+            if (ModelBase.class.isAssignableFrom(arg0type)) {
 
-if(daoClazz.getName().contains("UserDao")){
+                var field = CacheUtil.getCacheField(arg0type);
 
-    var mm="";
-}
+                if (field != null) {
 
-      //  var builder = Fire.builder().method(method).Db(defaultdb).methodReturnType(method.getReturnType());
+                    var cacheBy = field.getAnnotation(CacheBy.class);
+                    var cachePrefix = cacheBy.key();
+                    if (StringUtils.isEmpty(cachePrefix)) {
+                        cachePrefix = arg0type.getName() + "_";
+                    }
 
-      //  builder.Sharding(dbSharding);
+                    methodDescriptor.setCacheField(field);
+                    methodDescriptor.setCachePrefix(cachePrefix);
+                    methodDescriptor.setCacheTTL(cacheBy.ttl());
+                    methodDescriptor.setUseCache(true);
+                    // var keyType = TypeResolver.getActualType2(field.getType());
 
-        var parTypes = method.getParameterTypes();
+                    methodDescriptor.setKeyType(field.getType());
+                }
 
-        if (parTypes.length == 1) {
-            var type0 = parTypes[0];
-            if (QueryBase.class.isAssignableFrom(type0)) {
+            }
 
-                var fields = FieldUtils.getAllFields(type0);
+            if (QueryBase.class.isAssignableFrom(arg0type)) {
+
+                var modeType =   MetaUtil.getModelClassByQueryType(arg0type);
+              //  var modeType = TypeResolver.getActualType(arg0type);
+
+                var cacheField = CacheUtil.getCacheField( modeType);
+
+                if (cacheField != null) {
+                    var cacheBy = cacheField.getAnnotation(CacheBy.class);
+                    var cachePrefix = cacheBy.key();
+                    if (StringUtils.isEmpty(cachePrefix)) {
+                        cachePrefix = arg0type.getName() + "_";
+                    }
+
+                    methodDescriptor.setCacheField(cacheField);
+                    methodDescriptor.setCachePrefix(cachePrefix);
+                    methodDescriptor.setCacheTTL(cacheBy.ttl());
+                    methodDescriptor.setUseCache(true);
+                    // var keyType = TypeResolver.getActualType2(field.getType());
+                    methodDescriptor.setKeyType(cacheField.getType());
+                }
+
+                var fields = FieldUtils.getAllFields(arg0type);
+
+                var cacheFields = new ArrayList<Field>();
+
 
                 for (var field : fields) {
 
-                    var cacheBy = field.getAnnotation(CacheBy.class);
+                    var fieldNameqian = field.getName();
 
-                    if (cacheBy != null) {
-                        var cachePrefix=cacheBy.key();
-                        if(StringUtils.isEmpty(cachePrefix)){
-                            cachePrefix=type0.getName()+"_";
-                        }
+                    if (fieldNameqian.contains("_")) {
+                        var arr = fieldNameqian.split("_");
 
-
-
-                        methodDescriptor.setQueryCacheField(field);
-                        methodDescriptor.setCachePrefix(cachePrefix);
-                        methodDescriptor.setCacheTTL(cacheBy.ttl());
-
-                        var fieldName = field.getName();
-
-                        if (fieldName.contains("_")) {
-                            var arr = fieldName.split("_");
-
-                            fieldName = arr[0];
-                        }
-
-                        var meta = MetaUtil.getQueryMeta(type0);
-
-                        var modelClazz = meta.getModelClazz();
-
-                        var field4Model = FieldUtils.getField(modelClazz, fieldName, true);
-
-                        if (field4Model != null) {
-
-                            methodDescriptor.setModelCacheField(field4Model);
-                            methodDescriptor.setUseCache(true);
-                            var keyType = TypeResolver.getActualType2(field4Model.getType());
-
-                            methodDescriptor.setKeyType(keyType);
-
-                            break;
-                        }
-
+                        fieldNameqian = arr[0];
                     }
 
+
+                    if (cacheField.getName().equalsIgnoreCase(fieldNameqian)) {
+
+                        cacheFields.add(field);
+                    }
                 }
+                var fieldArray = new Field[cacheFields.size()];
+
+                methodDescriptor.setQueryCacheFields(cacheFields.toArray(fieldArray));
 
 
             }
 
         }
 
-       // var fire = builder.build();
+
+        // var fire = builder.build();
 
         fireLineMap.putIfAbsent(method, methodDescriptor);
 

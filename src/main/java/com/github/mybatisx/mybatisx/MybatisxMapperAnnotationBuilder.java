@@ -595,7 +595,7 @@ String[] statement= selectKeyAnnotation.statement();
             if (sql1.equals(SQL.SelectKey)) {
                 Method method2 = MybatisxMapperAnnotationBuilder.getCurrentMethod();
                 var MD = FireFactory.getFactory().getMD(method2);
-                resultTypeClass = MD.getReturnRawType();
+                resultTypeClass = MD.getReturnDescriptor().getMappedClass();
 
                 var PDlist = MD.getParameterDescriptors();
 

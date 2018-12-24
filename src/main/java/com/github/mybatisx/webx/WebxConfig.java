@@ -1,4 +1,4 @@
-package com.github.mybatisx.config;
+package com.github.mybatisx.webx;
 
 
 import com.github.mybatisx.webx.register.WebxServiceImplScanner;

@@ -30,11 +30,13 @@ public class cacheAspect {
     }
 
 
-    @Pointcut("execution(public * com.*.*.dao..*.*(..))")
-    public void dao() {
-    }
-
-    @Around("dao()")
+//    @Pointcut("execution(public * com.*.*.dao..*.*(..))")
+//    public void dao() {
+//    }
+//    @Pointcut("@annotation(com.github.mybatisx.annotation.WebxService)")
+//    public void dao() {
+//    }
+   // @Around("dao()")
     public Object beforeSwitchDb(ProceedingJoinPoint point) throws Throwable {
 
         //获得目标方法标签point
@@ -43,7 +45,7 @@ public class cacheAspect {
         var k3 = k1.getTarget();
         var handler = Proxy.getInvocationHandler(k3);
         var m = (MapperProxy) handler;
-        var dao = (Class<?>) FieldUtils.readDeclaredField(m, "mapperInterface", true);
+      //  var dao = (Class<?>) FieldUtils.readDeclaredField(m, "mapperInterface", true);
 
         //  ((MapperProxy) ((Proxy) ((ReflectiveMethodInvocation) ().methodInvocation).target).h).mapperInterface
 
@@ -86,15 +88,15 @@ public class cacheAspect {
         if (MD.isUseCache() == false) {
 
             v= point.proceed(args);
-        }
-        else if (!isPaging || !IsOnlyCache(args[0], MD.getQueryCacheField())) {
-            v= point.proceed(args);
+       // }
+        //else if (!isPaging || !IsOnlyCache(args[0], MD.getQueryCacheField())) {
+        //    v= point.proceed(args);
         } else {
             //处理缓存
 
-            var operator = new CacheableOperator(point, MD);
+           // var operator = new CacheableOperator(point, MD);
 
-            v = operator.invoke();
+           // v = operator.invoke();
 
         }
 

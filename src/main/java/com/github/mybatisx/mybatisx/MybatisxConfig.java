@@ -1,19 +1,22 @@
-package com.github.mybatisx.config;
+package com.github.mybatisx.mybatisx;
 
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
-import com.github.mybatisx.mybatisx.LangDriverx;
-import com.github.mybatisx.mybatisx.MyBatisInterceptor;
-import com.github.mybatisx.mybatisx.MybatisxConfiguration;
+import com.github.mybatisx.aspect.AspectJExpressionPointcutX;
+import com.github.mybatisx.aspect.cacheMethodInterceptor;
+import com.github.mybatisx.config.DynamicDataSource;
+import com.github.mybatisx.util.TempUtil;
 import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.logging.log4j2.Log4j2Impl;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -27,16 +30,59 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
 
-@Configuration
 
 public class MybatisxConfig implements EnvironmentAware {
-
+    public MybatisxConfig() {
+        var mm = "";
+    }
 
     private Environment env;
 
+
+//@Bean(name="aa")
+//@ConditionalOnMissingBean
+//public PointcutAdvisor staticMethodMatcherPointcutAdvisor(){
+//    var a= new cacheAdvisor();
+//    var arount= new cacheMethodAroundAdvice();
+//    a.setAdvice(arount);
+//    return a;
+//}
+
     @Bean
     @ConditionalOnMissingBean
-    public DataSource getDataSource()  {
+    public AspectJExpressionPointcut aspectJExpressionPointcut() {
+        var pointcut = new AspectJExpressionPointcutX();
+        var pkg= TempUtil.daoPackageNames;
+        pointcut.setExpression("execution(public * com.github.mybatisx_demo_api..*.*(..))");
+        return pointcut;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public Advisor per() {
+        var advice = new cacheMethodInterceptor();
+        return new DefaultPointcutAdvisor(aspectJExpressionPointcut(), advice);
+    }
+
+//public test getcacheAdvisor(){
+//    var p= new ProxyFactoryBean();
+//    AspectJExpressionPointcut pointcut= new AspectJExpressionPointcut();
+//    pointcut.setExpression("execution(public * com.github.mybatisx_demo_api..*.*(..))");
+//    var arount= new cacheMethodAroundAdvice();
+//    cacheAdvisor advisor = new cacheAdvisor(pointcut,arount);
+//    p.addAdvisor(advisor);
+//    p.setProxyTargetClass(true);
+//
+//   // var p= new ProxyFactoryBean();
+//   // p.setInterceptorNames(new String[]{"aa"});
+//
+//   // p.setProxyTargetClass(true);
+//    return new test();
+//}
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DataSource getDataSource() {
 
 
         var dynamicDataSource = new DynamicDataSource();
@@ -47,7 +93,7 @@ public class MybatisxConfig implements EnvironmentAware {
 
         for (var key : keys) {
 
-            if(StringUtils.isEmpty(key))
+            if (StringUtils.isEmpty(key))
                 continue;
             Properties props = new Properties();
             props.put("driverClassName", env.getProperty(String.format("shihang.datasource.%s.driver-class-name", key), ""));
@@ -94,12 +140,12 @@ public class MybatisxConfig implements EnvironmentAware {
         var pro = new Properties();
         pro.setProperty("helperDialect", "mysql");
         var pageInterceptor = new PageInterceptor();
-       pageInterceptor.setProperties(pro);
+        pageInterceptor.setProperties(pro);
 
-       var interceptors = new Interceptor[2];
-       interceptors[0] = pageInterceptor;
-       var it1 = new MyBatisInterceptor();
-       interceptors[1] = it1;
+        var interceptors = new Interceptor[2];
+        interceptors[0] = pageInterceptor;
+        var it1 = new MyBatisInterceptor();
+        interceptors[1] = it1;
         factory.setPlugins(interceptors);
 
 
@@ -113,7 +159,7 @@ public class MybatisxConfig implements EnvironmentAware {
         factory2.getConfiguration().setLogImpl(Log4j2Impl.class);
 
         factory2.getConfiguration().setDefaultScriptingLanguage(LangDriverx.class);
-      //  var kk=factory2.getConfiguration().getIncompleteMethods();
+        //  var kk=factory2.getConfiguration().getIncompleteMethods();
         // factory2.getConfiguration().addIncompleteMethod(null);
         return factory2;
 
@@ -126,6 +172,6 @@ public class MybatisxConfig implements EnvironmentAware {
 
     @Override
     public void setEnvironment(Environment environment) {
-        this.env= environment;
+        this.env = environment;
     }
 }

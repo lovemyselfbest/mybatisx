@@ -1,5 +1,6 @@
 package com.github.mybatisx.base;
 
+import com.github.mybatisx.annotation.CacheBy;
 import com.github.mybatisx.annotation.WebxRequestMapping;
 import com.github.mybatisx.base.ModelBase;
 import com.github.mybatisx.base.QueryBase;
@@ -9,6 +10,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 

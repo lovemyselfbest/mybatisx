@@ -10,6 +10,7 @@ public class MybatisxConfiguration extends Configuration {
     protected final MapperRegistry mapperRegistry = new MybatisxMapperRegistry(this);
 
     public MybatisxConfiguration() {
+
         super();
     }
 
