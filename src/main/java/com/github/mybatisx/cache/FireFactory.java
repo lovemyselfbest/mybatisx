@@ -7,7 +7,7 @@ import com.github.mybatisx.base.ModelBase;
 import com.github.mybatisx.base.QueryBase;
 import com.github.mybatisx.descriptor.MethodDescriptor;
 import com.github.mybatisx.descriptor.MethodUtil;
-import com.github.mybatisx.test;
+
 import com.github.mybatisx.util.MetaUtil;
 import com.github.mybatisx.util.TypeResolver;
 import org.apache.commons.lang3.ArrayUtils;
