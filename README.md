@@ -44,7 +44,7 @@ spring.cloud.zookeeper.connect-string=10.1.44.62:2181
 spring.cloud.zookeeper.discovery.instance-host=10.1.44.62
 spring.cloud.zookeeper.discovery.instance-port=${server.port}
 ```
-###启动成功后自动注册节点如下(带版本号节点)
+###启动成功后自动注册节点如下(带版本号节点)<br/>
 ![image](https://github.com/mybatisx/mybatisx/blob/master/Doc/imgs/zk.png)
 ## 2) 客户端
 
