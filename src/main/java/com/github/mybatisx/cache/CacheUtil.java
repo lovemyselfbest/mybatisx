@@ -57,4 +57,13 @@ public class CacheUtil {
 
         return null;
     }
+
+    public static void remove(String key) {
+
+        var redis = SpringUtils.getBean(RedisClient.class);
+
+        redis.remove(key);
+
+
+    }
 }

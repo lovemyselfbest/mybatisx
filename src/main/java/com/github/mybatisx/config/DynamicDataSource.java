@@ -9,6 +9,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
     protected Object determineCurrentLookupKey() {
 
         // log.debug("数据源为{}", DataSourceContextHolder.getDBKey());
-        return  DataSourceContextHolder.getDBKey();
+        var dbkey=DataSourceContextHolder.getDBKey();
+        return  dbkey;
     }
 }

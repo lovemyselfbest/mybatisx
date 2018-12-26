@@ -7,6 +7,7 @@ import com.github.mybatisx.aspect.cacheMethodInterceptor;
 import com.github.mybatisx.config.DynamicDataSource;
 import com.github.mybatisx.util.TempUtil;
 import com.github.pagehelper.PageInterceptor;
+import lombok.SneakyThrows;
 import org.apache.ibatis.logging.log4j2.Log4j2Impl;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -31,10 +32,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 
-public class MybatisxConfig implements EnvironmentAware {
-    public MybatisxConfig() {
-        var mm = "";
-    }
+public class Config implements EnvironmentAware {
 
     private Environment env;
 
@@ -52,7 +50,7 @@ public class MybatisxConfig implements EnvironmentAware {
     @ConditionalOnMissingBean
     public AspectJExpressionPointcut aspectJExpressionPointcut() {
         var pointcut = new AspectJExpressionPointcutX();
-        var pkg= TempUtil.daoPackageNames;
+        var pkg = TempUtil.daoPackageNames;
         pointcut.setExpression("execution(public * com.github.mybatisx_demo_api..*.*(..))");
         return pointcut;
     }
@@ -82,6 +80,7 @@ public class MybatisxConfig implements EnvironmentAware {
 
     @Bean
     @ConditionalOnMissingBean
+    @SneakyThrows
     public DataSource getDataSource() {
 
 
@@ -100,13 +99,9 @@ public class MybatisxConfig implements EnvironmentAware {
             props.put("url", env.getProperty(String.format("shihang.datasource.%s.url", key), ""));
             props.put("username", env.getProperty(String.format("shihang.datasource.%s.username", key), ""));
             props.put("password", env.getProperty(String.format("shihang.datasource.%s.password", key), ""));
-
-            DataSource dataSource = null;
-            try {
-                dataSource = DruidDataSourceFactory.createDataSource(props);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            props.put("minldle", 88);
+            props.put("initialSize", "7");
+            DataSource dataSource  = DruidDataSourceFactory.createDataSource(props);
             dsMaps.put(key, dataSource);
         }
         dynamicDataSource.setTargetDataSources(dsMaps);
@@ -166,8 +161,9 @@ public class MybatisxConfig implements EnvironmentAware {
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new DataSourceTransactionManager(getDataSource());
+    public PlatformTransactionManager transactionManager(DataSource ds) {
+
+        return new DataSourceTransactionManager(ds);
     }
 
     @Override

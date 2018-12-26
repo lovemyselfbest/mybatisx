@@ -8,9 +8,11 @@ import java.lang.annotation.*;
 @Documented
 public @interface CacheBy {
 
-   // String  db() default "";
+    String  prefix() default "";
 
-    String key() default "";
+    String cacheKey() default "";
+
+   // Class<?> hitClass()   ;
 
     int ttl() default 3600;
 

@@ -140,75 +140,38 @@ public class MethodDescriptor {
         return null;
     }
 
-    public void init() {
-        if (parameterDescriptors.size() == 1) {
 
-            var type0 = parameterDescriptors.get(0).getRawType();
-            if (QueryBase.class.isAssignableFrom(type0)) {
-
-                var fields = FieldUtils.getAllFields(type0);
-
-                for (var field : fields) {
-
-                    var cacheBy = field.getAnnotation(CacheBy.class);
-
-                    if (cacheBy != null) {
-                        cachePrefix = cacheBy.key();
-                        cacheTTL = cacheBy.ttl();
-                        if (StringUtils.isEmpty(cachePrefix)) {
-                            cachePrefix = type0.getName() + "_";
-                        }
-                        // builder.cachebyField4Query(field).cachePrefix(cachePrefix).cacheTTL(cacheBy.ttl());
-
-                        var fieldName = field.getName();
-
-                        if (fieldName.contains("_")) {
-                            var arr = fieldName.split("_");
-
-                            fieldName = arr[0];
-                        }
-
-                        var meta = MetaUtil.getQueryMeta(type0);
-
-                        var modelClazz = meta.getModelClazz();
-
-                        var field4Model = FieldUtils.getField(modelClazz, fieldName, true);
-
-                        if (field4Model != null) {
-                            //builder.cachebyField4Model(field4Model).IsCaching(true);
-                            this.isUseCache = true;
-                            this.cacheField = field4Model;
-                           // this.queryCacheField = field;
-                            var keyType = TypeResolver.getActualType2(field4Model.getType());
-                            //  builder.keyType(keyType);
-                            this.keyType = keyType;
-                            this.modelClazz = modelClazz;
-                            // builder.valueType(modelClazz);
-                            break;
-                        }
-
-                    }
-
-                }
-
-
-            }
-        }
-    }
 
     @Getter @Setter
     private boolean isUseCache;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Field[] queryCacheFields;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Field cacheField;
 
-    @Getter @Setter
+    @Getter
+    @Setter
+    private Class<?> mybatisOperation;
+    @Getter
+    @Setter
+    private String cachePrefix;
+
+    @Getter
+    @Setter
+    private String cacheKey;
+
+
+    @Getter
+    @Setter
     private Class<?> keyType;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Class<?> modelClazz;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String url;
 
     public List<Annotation> getAnnotations() {
@@ -230,15 +193,9 @@ public class MethodDescriptor {
         return returnDescriptor.getAnnotation(annotationType);
     }
 
-    public CacheBy getCacheBy() {
 
-        return getAnnotation(CacheBy.class);
-
-    }
-
-    @Getter @Setter
-    private String cachePrefix;
-    @Getter @Setter
+    @Getter
+    @Setter
     private int cacheTTL;
 
     public boolean isReturnGeneratedId() {

@@ -58,7 +58,7 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
 
         var fields = MetaUtil.getAllFields2(modelClazz);
 
-        if(QueryBase.class.isAssignableFrom(modelClazz))
+        if (QueryBase.class.isAssignableFrom(modelClazz))
             return;
 
 
@@ -75,7 +75,6 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
 
 
     }
-
 
 
     /**
@@ -164,6 +163,45 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
                 sb.append(String.format(" where %s=#{%s} ", pkName, pkFieldName));
                 script = "<script>" + sb.toString() + "</script>";
                 break;
+            case SQL.Delete:
+                parameterType = MD.getParameterDescriptors().get(0).getRawType();
+                checkAutoSqlGenerator(parameterType);
+
+                table = parameterType.getAnnotation(Table.class);
+                if (table == null)
+                    throw new IllegalArgumentException("参数表名不对");
+
+                fields = MetaUtil.getAllFields2(parameterType);
+
+                sb = new StringBuilder();
+                sb.append(" delete  from  ");
+                sb.append(table.value());
+                sb.append(" ");
+
+
+                pkName = "";
+                pkFieldName = "";
+                Field pk2 = null;
+                for (Field field : fields) {
+
+                    var id = field.getAnnotation(ID.class);
+
+                    if (id != null) {
+                        pk2 = field;
+                        pkFieldName = field.getName();
+                        pkName = pkFieldName;
+                        var column = field.getAnnotation(Column.class);
+                        if (column != null) {
+                            pkName = column.value();
+                        }
+                    }
+
+                }
+                if (pk2 == null)
+                    throw new IllegalArgumentException("参数不对4");
+                sb.append(String.format(" where %s=#{%s} ", pkName, pkFieldName));
+                script = "<script>" + sb.toString() + "</script>";
+                break;
             case SQL.Insert:
                 parameterType = MD.getParameterDescriptors().get(0).getRawType();
                 checkAutoSqlGenerator(parameterType);
@@ -182,26 +220,24 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
 
                 //
 
-                ID idAnno=null;
-                String idName="";
+                ID idAnno = null;
+                String idName = "";
                 for (Field field : fields) {
                     // 排除被Ignore修饰的变量
                     if (!field.isAnnotationPresent(Ignore.class)) {
 
-                       var idAnno2 = field.getAnnotation(ID.class);
+                        var idAnno2 = field.getAnnotation(ID.class);
 
-                        if(idAnno2 !=null){
-                            idAnno=idAnno2;
-                            idName= field.getName();
+                        if (idAnno2 != null) {
+                            idAnno = idAnno2;
+                            idName = field.getName();
                             var columnID = field.getAnnotation(Column.class);
-                            if (columnID != null){
-                                idName= columnID.value();
+                            if (columnID != null) {
+                                idName = columnID.value();
                             }
-                            if(idAnno.autoGenerateId()==true)
+                            if (idAnno.autoGenerateId() == true)
                                 continue;
                         }
-
-
 
 
                         var columnName = field.getName();
@@ -220,10 +256,10 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
                 tmp2.deleteCharAt(tmp2.lastIndexOf(","));
                 sb.append(String.format("(%s) values (%s)", tmp1, tmp2));
 
-                if(idAnno.autoGenerateId()==true){
-                   // sb.append(String.format("; select 1 as id",idName));
-                }else{
-                  //  sb.append(String.format("; select LAST_INSERT_ID() as `%s`",idName));
+                if (idAnno.autoGenerateId() == true) {
+                    // sb.append(String.format("; select 1 as id",idName));
+                } else {
+                    //  sb.append(String.format("; select LAST_INSERT_ID() as `%s`",idName));
                 }
                 script = "<script>" + sb.toString() + "</script>";
 
@@ -295,6 +331,9 @@ public class LangDriverx extends XMLLanguageDriver implements LanguageDriver {
 
                             case "lt":
                                 sb.append(String.format("\n<if test=\"%s != null\"> <![CDATA[ AND %s < #{%s} ]]> </if>", columnName, arr[0], columnName));
+                                break;
+                            case "gt":
+                                sb.append(String.format("\n<if test=\"%s != null\"> <![CDATA[ AND %s > #{%s} ]]> </if>", columnName, arr[0], columnName));
                                 break;
                         }
                     }

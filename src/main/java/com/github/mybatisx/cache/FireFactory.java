@@ -2,20 +2,33 @@ package com.github.mybatisx.cache;
 
 
 import com.github.mybatisx.annotation.CacheBy;
+import com.github.mybatisx.annotation.ID;
 import com.github.mybatisx.base.ModelBase;
 import com.github.mybatisx.base.QueryBase;
 import com.github.mybatisx.descriptor.MethodDescriptor;
 import com.github.mybatisx.descriptor.MethodUtil;
+import com.github.mybatisx.test;
 import com.github.mybatisx.util.MetaUtil;
 import com.github.mybatisx.util.TypeResolver;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FireFactory {
 
@@ -63,64 +76,123 @@ public class FireFactory {
             return opt.get();
 
 
-        var methodDescriptor = MethodUtil.getMethodDescriptor(daoClazz, method, false);
+        var MD = MethodUtil.getMethodDescriptor(daoClazz, method, false);
+
+        var op= MD.getAnnotation(Update.class);
+        if(op!=null){
+            MD.setMybatisOperation(Update.class);
+        }
+        var op2= MD.getAnnotation(Select.class);
+        if(op2!=null){
+            MD.setMybatisOperation(Select.class);
+        }
+
+        var op3= MD.getAnnotation(Delete.class);
+        if(op3!=null){
+            MD.setMybatisOperation(Delete.class);
+        }
+        var op4= MD.getAnnotation(Insert.class);
+        if(op4!=null){
+            MD.setMybatisOperation(Insert.class);
+        }
+
+        var parTypes = MD.getParameterDescriptors();
+
+        var cacheBy=method.getAnnotation(CacheBy.class);
+
+       if(cacheBy==null)  {
+           cacheBy= MD.getAnnotation(CacheBy.class);
+       }
+
+        if (cacheBy != null) {
+
+            var script = cacheBy.cacheKey();
+
+            MD.setCachePrefix(cacheBy.prefix());
+
+            Pattern p = Pattern.compile(":\\d+(\\.\\w+)?");
+
+            Matcher m = p.matcher(script);
+
+            var maps = new HashMap<Integer, String>();
+            int i = 1;
+            while (m.find()) {
+                maps.putIfAbsent(i, m.group());
+                i++;
+            }
 
 
-        var parTypes = methodDescriptor.getParameterDescriptors();
+            var index=1;
+            String defalutFieldName="";
 
-        if (parTypes.size() == 1) {
-            var arg0type = parTypes.get(0).getRawType();
+            for (Map.Entry<Integer, String> entry : maps.entrySet()) {
 
-            if (ModelBase.class.isAssignableFrom(arg0type)) {
+                var k = entry.getKey();
+                var v = entry.getValue();
 
-                var field = CacheUtil.getCacheField(arg0type);
+                index=k-1;
 
-                if (field != null) {
+                if(v.contains(".")){
 
-                    var cacheBy = field.getAnnotation(CacheBy.class);
-                    var cachePrefix = cacheBy.key();
-                    if (StringUtils.isEmpty(cachePrefix)) {
-                        cachePrefix = arg0type.getName() + "_";
-                    }
+                    var p1= v.split("\\.");
+                    var p2=p1[p1.length-1];
+                    defalutFieldName=p2;
+                }
 
-                    methodDescriptor.setCacheField(field);
-                    methodDescriptor.setCachePrefix(cachePrefix);
-                    methodDescriptor.setCacheTTL(cacheBy.ttl());
-                    methodDescriptor.setUseCache(true);
-                    // var keyType = TypeResolver.getActualType2(field.getType());
 
-                    methodDescriptor.setKeyType(field.getType());
+                script= script.replace(":"+k,"#param"+k);
+
+                MD.setCacheKey(script);
+
+            }
+
+
+
+
+
+
+            var argItType = parTypes.get(index).getRawType();
+
+            if (ModelBase.class.isAssignableFrom(argItType)) {
+
+
+                if (StringUtils.isNotEmpty(defalutFieldName)) {
+
+
+
+                 var field=FieldUtils.getDeclaredField(argItType, defalutFieldName,true);
+
+                    MD.setCacheField(field);
+
+                    MD.setCacheTTL(cacheBy.ttl());
+                    MD.setUseCache(true);
+                    MD.setKeyType(field.getType());
                 }
 
             }
 
-            if (QueryBase.class.isAssignableFrom(arg0type)) {
+            if (QueryBase.class.isAssignableFrom(argItType)) {
 
-                var modeType =   MetaUtil.getModelClassByQueryType(arg0type);
-              //  var modeType = TypeResolver.getActualType(arg0type);
 
-                var cacheField = CacheUtil.getCacheField( modeType);
+                if (StringUtils.isNotEmpty(defalutFieldName)) {
 
-                if (cacheField != null) {
-                    var cacheBy = cacheField.getAnnotation(CacheBy.class);
-                    var cachePrefix = cacheBy.key();
-                    if (StringUtils.isEmpty(cachePrefix)) {
-                        cachePrefix = arg0type.getName() + "_";
-                    }
+                var argItModleType= MetaUtil.getModelClassByQueryType(argItType);
 
-                    methodDescriptor.setCacheField(cacheField);
-                    methodDescriptor.setCachePrefix(cachePrefix);
-                    methodDescriptor.setCacheTTL(cacheBy.ttl());
-                    methodDescriptor.setUseCache(true);
-                    // var keyType = TypeResolver.getActualType2(field.getType());
-                    methodDescriptor.setKeyType(cacheField.getType());
+                    var field=FieldUtils.getDeclaredField(argItModleType, defalutFieldName,true);
+
+                    MD.setCacheField(field);
+
+                    MD.setCacheTTL(cacheBy.ttl());
+                    MD.setUseCache(true);
+
+                    MD.setKeyType(field.getType());
                 }
 
-                var fields = FieldUtils.getAllFields(arg0type);
+                var fields = FieldUtils.getAllFields(argItType);
 
                 var cacheFields = new ArrayList<Field>();
 
-
+                var inStr= new String[]{"eq","in"};
                 for (var field : fields) {
 
                     var fieldNameqian = field.getName();
@@ -129,17 +201,20 @@ public class FireFactory {
                         var arr = fieldNameqian.split("_");
 
                         fieldNameqian = arr[0];
+
+                        if(!ArrayUtils.contains(inStr,arr[1])){
+                            continue;
+                        }
                     }
 
-
-                    if (cacheField.getName().equalsIgnoreCase(fieldNameqian)) {
+                    if (defalutFieldName.equalsIgnoreCase(fieldNameqian)) {
 
                         cacheFields.add(field);
                     }
                 }
                 var fieldArray = new Field[cacheFields.size()];
 
-                methodDescriptor.setQueryCacheFields(cacheFields.toArray(fieldArray));
+                MD.setQueryCacheFields(cacheFields.toArray(fieldArray));
 
 
             }
@@ -147,11 +222,11 @@ public class FireFactory {
         }
 
 
-        // var fire = builder.build();
 
-        fireLineMap.putIfAbsent(method, methodDescriptor);
 
-        return methodDescriptor;
+        fireLineMap.putIfAbsent(method, MD);
+
+        return MD;
 
     }
 }
