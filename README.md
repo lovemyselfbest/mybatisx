@@ -52,7 +52,7 @@ spring.cloud.zookeeper.discovery.instance-port=${server.port}
 ```
 @EnableDiscoveryClient
 @SpringBootApplication()
-@EnableWebx("b类接口包名")
+@EnableWebx
 public class App {
 }
 ```
