@@ -2,6 +2,7 @@
 
 ## 1) 定义service接口,接口有两种形式: 
    ### a类: 纯数据模型接口
+   #### crudDao已具备增删改查功能, 如果需特殊功能,自行添加接口如下面customUpdate
 ```
 @Mapper
 @WebxService("orderdata")
@@ -9,9 +10,9 @@
 @CacheBy( prefix = "testtt_",cacheKey = ":1.id", ttl = 60*60)
 public interface UserDao  extends crudDao<User, UserQuery> {
     @WebxRequestMapping
-    @Update("update user set age=:1.age where id=:1.id ")
-   // @CacheBy( prefix = "te2sttt_",cacheKey = ":1.id", ttl = 60*60) 支持单独设置缓存规则
-    public  int update3(User user1);
+    @Update("update user set age=:1.age where id=:2")
+   //@CacheBy( prefix = "te2sttt_",cacheKey = ":1.id", ttl = 60*60) 支持单独设置缓存规则
+    public  int customUpdate(User user1, int schoolId);
 }
 ```
 
