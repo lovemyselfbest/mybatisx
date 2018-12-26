@@ -1,7 +1,7 @@
 # 使用方式
-***
+------
 ## 1) 定义service接口,接口有两种形式: 
-   ### a类: 纯数据模型接口
+   > *a类: 纯数据模型接口
    #### crudDao已具备增删改查功能, 如果需特殊功能,自行添加接口如下面customUpdate
 ```
 @Mapper
@@ -16,7 +16,7 @@ public interface UserDao  extends crudDao<User, UserQuery> {
 }
 ```
 
-   ### b类: 领域模型接口
+> *b类: 领域模型接口
 ```
 @WebxService("orderdata")
 public interface UserService {
@@ -75,7 +75,6 @@ public class Test {
     private UserService userService;
 
     public void  test(){
-
         var age = (int) (1 + Math.random() * (100 - 1 + 1));
         var user = User.builder().id(6).age(age).namex("test"+age).build();
         var k= userService.getLevel(5);
