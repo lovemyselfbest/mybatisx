@@ -44,6 +44,8 @@ spring.cloud.zookeeper.connect-string=10.1.44.62:2181
 spring.cloud.zookeeper.discovery.instance-host=10.1.44.62
 spring.cloud.zookeeper.discovery.instance-port=${server.port}
 ```
+###启动成功后自动注册节点如下(带版本号节点)
+![image](https://github.com/mybatisx/mybatisx/blob/master/Doc/imgs/zk.png)
 ## 2) 客户端
 
 
@@ -57,7 +59,7 @@ public class App {
 配置文件
 ```
 spring.application.name = otherapp
-orderdata.version=v3
+orderdata.version=v3  //指定调用orderdata的v3节点下的服务
 spring.cloud.zookeeper.connect-string=10.1.44.62:2181
 ```
 ```
