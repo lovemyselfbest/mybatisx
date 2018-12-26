@@ -1,5 +1,5 @@
 # 使用方式
-
+***
 ## 1) 定义service接口,接口有两种形式: 
    ### a类: 纯数据模型接口
    #### crudDao已具备增删改查功能, 如果需特殊功能,自行添加接口如下面customUpdate
@@ -25,6 +25,7 @@ public interface UserService {
     public  int getLevel(long userId);
 }
 ```
+***
 ## 2) 服务端
 
 
@@ -46,6 +47,7 @@ spring.cloud.zookeeper.discovery.instance-port=${server.port}
 ```
 ###启动成功后自动注册节点如下(带版本号节点)<br/>
 ![image](https://github.com/mybatisx/mybatisx/blob/master/Doc/imgs/zk.png)
+***
 ## 2) 客户端
 
 
