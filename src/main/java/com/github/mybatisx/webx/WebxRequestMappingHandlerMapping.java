@@ -7,6 +7,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.web.servlet.mvc.condition.*;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -16,13 +18,22 @@ import java.lang.reflect.Method;
 public class WebxRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
     @Override
     protected boolean isHandler(Class<?> beanType) {
-        if (beanType.getName().toLowerCase().contains("userserviceimpl")) {
 
-            String mm = "";
-        }
+        var b1= (AnnotationUtils.findAnnotation(beanType, RestController.class) != null);
+        var b2= (AnnotationUtils.findAnnotation(beanType, WebxService.class) != null);
+        var b3= (AnnotationUtils.findAnnotation(beanType, org.springframework.stereotype.Controller.class) != null);
 
 
-        return (AnnotationUtils.findAnnotation(beanType, WebxService.class) != null);
+       if(b1==true)
+           return true;
+
+       if(b2==true)
+           return true;
+
+        if(b3==true)
+            return true;
+
+       return false;
     }
 
     protected RequestMappingInfo createRequestMappingInfo(Method method, Class<?> handlerType, WebxRequestMapping annotation,

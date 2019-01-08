@@ -23,10 +23,8 @@ import java.util.Map;
  * 注意：此转换器支持的格式是application/vson , VSON<br/>
  * <p>
  * 格式 name:vv;age:27;date:2017;
- *
-
  */
-public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
+public class HttpMessageConvertX extends AbstractHttpMessageConverter<Object>
         implements GenericHttpMessageConverter<Object> {
 
     private final static Class<?> requestMapClazz = new HashMap<String, String>().getClass();
@@ -37,7 +35,7 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
 
     public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-    public WebxHttpMessageConvert() {
+    public HttpMessageConvertX() {
         // 此转换器支持的格式是application/vson
         super(new MediaType("application", "dubbo", DEFAULT_CHARSET));
     }
@@ -77,6 +75,9 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
     @Override
     public boolean canWrite(Class<?> clazz, MediaType mediaType) {
 
+        if (!this.canWrite(mediaType)) {
+            return false;
+        }
         return canWrite(mediaType);
     }
 
@@ -89,13 +90,11 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
     这两个是新加的，之前的上面没有
      */
     //
-
-
-
-
     @Override
     public boolean canWrite(Type type, Class<?> clazz, MediaType mediaType) {
-
+        if (clazz.getPackageName().contains("springfox.documentation.swagger.web")) {
+            return false;
+        }
         return true;
     }
 
@@ -111,20 +110,19 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
         writeMap(o, outputMessage);
     }
 
-
+    //写出数据
     private void writeMap(Object o, HttpOutputMessage outputMessage) throws IOException {
 
 
+        var builder = ResponseData.builder().error(0).msg("").data(o);
 
-        var builder= ResponseData.builder().error(0).msg("").data(o);
-
-        if(o instanceof Page){
-            var total= Long.valueOf(((Page) o).getTotal());
-            var pageNum=Long.valueOf(((Page) o).getPages());
+        if (o instanceof Page) {
+            var total = Long.valueOf(((Page) o).getTotal());
+            var pageNum = Long.valueOf(((Page) o).getPages());
             builder.totalCount(total).pageCount(pageNum);
         }
 
-        var res= builder.build();
+        var res = builder.build();
 
         String v = JSON.toJSONString(res);
 
@@ -140,6 +138,8 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
      * @throws IOException                     e
      * @throws HttpMessageNotReadableException e
      */
+
+//读取数据
     private Object readMap(HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
         // 从inputMessage中读取内容
         StringBuilder stringBuilder = new StringBuilder();
@@ -164,5 +164,6 @@ public class WebxHttpMessageConvert extends AbstractHttpMessageConverter<Object>
         RequestData requestData = new RequestData();
         requestData.setData(map);
         return requestData;
-    }}
+    }
+}
 

@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 
-public class Config implements EnvironmentAware {
+public class config implements EnvironmentAware {
 
     private Environment env;
 

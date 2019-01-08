@@ -19,47 +19,48 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @ConditionalOnWebApplication
-public class WebxConfig  implements EnvironmentAware {
+public class Config implements EnvironmentAware {
 
 
     @Bean
-    public RestTemplate restTemplate(){
+    public RestTemplate restTemplate() {
 
-        return  new  RestTemplate();
+        return new RestTemplate();
     }
-@Bean
-@ConditionalOnMissingBean(WebxServiceImplScanner.class)
-public WebxServiceImplScanner webxServiceImplScanner(){
 
-    List<String> packages= Lists.newArrayList("**.implement.**");
+    @Bean
+    @ConditionalOnMissingBean(WebxServiceImplScanner.class)
+    public WebxServiceImplScanner webxServiceImplScanner() {
 
-    var scanner = new WebxServiceImplScanner();
-    scanner.setPackages(packages);
+        List<String> packages = Lists.newArrayList("**.implement.**");
 
-    return  scanner;
+        var scanner = new WebxServiceImplScanner();
+        scanner.setPackages(packages);
 
-}
+        return scanner;
+
+    }
 
 
     @Bean
     @ConditionalOnMissingBean(ZookeeperRegistration.class)
     public ServiceInstanceRegistration serviceInstanceRegistration(ApplicationContext ctx, ZookeeperDiscoveryProperties properties) {
 
-        String appName = env.getProperty("spring.application.name","");
+        String appName = env.getProperty("spring.application.name", "");
 
-        if(StringUtils.isEmpty(appName)){
+        if (StringUtils.isEmpty(appName)) {
             throw new IllegalArgumentException("spring.application.name is not set");
         }
 
-        var versionName= String.format("%s.version",appName);
+        var versionName = String.format("%s.version", appName);
 
-        String version = env.getProperty(versionName,"");
+        String version = env.getProperty(versionName, "");
 
-        if(StringUtils.isEmpty(version)){
-            throw new IllegalArgumentException(String.format("%s.version is not set",appName));
+        if (StringUtils.isEmpty(version)) {
+            throw new IllegalArgumentException(String.format("%s.version is not set", appName));
         }
 
-        appName=String.join("/",appName,version);
+        appName = String.join("/", appName, version);
 
         String host = properties.getInstanceHost();
         if (!StringUtils.hasText(host)) {
@@ -86,8 +87,9 @@ public WebxServiceImplScanner webxServiceImplScanner(){
     }
 
     private Environment env;
+
     @Override
     public void setEnvironment(Environment environment) {
-        this.env= environment;
+        this.env = environment;
     }
 }
