@@ -76,7 +76,7 @@ public class FireFactory {
             return opt.get();
 
 
-        var MD = MethodUtil.getMethodDescriptor(daoClazz, method, false);
+        var MD = MethodUtil.getMethodDescriptor(daoClazz, method, true);
 
         var op= MD.getAnnotation(Update.class);
         if(op!=null){

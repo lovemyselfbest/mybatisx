@@ -58,24 +58,32 @@ public class TypeResolver {
     public static Object getDefaultValue(Class<?> clazz) {
 
         Object ret = null;
+
+        if (clazz == int.class) {
+            ret = 1;
+        }
+        if (clazz == long.class) {
+            ret = 1;
+        }
+
         if (clazz == String.class) {
-            ret = "";
+            ret = "\"String\"";
         } else if (clazz == BigInteger.class) {
-            ret = 0;
+            ret = 1;
         } else if (clazz == Long.class) {
-            ret = 0L;
+            ret = 1L;
         } else if (clazz == Integer.class) {
-            ret = null;
+            ret = 1;
         } else if (clazz == Short.class) {
-            ret = 0;
+            ret = 1;
         } else if (clazz == Byte.class) {
-            ret = 0;
+            ret = 1;
         } else if (clazz == BigDecimal.class) {
-            ret = 0L;
+            ret = 1L;
         } else if (clazz == Double.class) {
-            ret = 0;
+            ret = 1;
         } else if (clazz == Float.class) {
-            ret = 0;
+            ret = 1;
         } else if (clazz == Boolean.class) {
             ret = false;
         }

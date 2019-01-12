@@ -5,7 +5,7 @@ import com.github.mybatisx.util.SpringUtils;
 import lombok.SneakyThrows;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.aspectj.lang.ProceedingJoinPoint;
+
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
