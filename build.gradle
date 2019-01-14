@@ -50,10 +50,10 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-aop:2.1.1.RELEASE')
     implementation('org.springframework.boot:spring-boot-starter-web:2.1.1.RELEASE')
 
-    implementation('org.springframework.cloud:spring-cloud-starter-zookeeper-discovery'){
+    implementation('org.springframework.cloud:spring-cloud-starter-zookeeper-discovery:2.1.0.M1'){
         exclude group: 'org.apache.zookeeper',module:'zookeeper'
     }
-    implementation('org.springframework.cloud:spring-cloud-starter-zookeeper-config'){
+    implementation('org.springframework.cloud:spring-cloud-starter-zookeeper-config:2.1.0.M1'){
         exclude group: 'org.apache.zookeeper',module:'zookeeper'
     }
    compile('org.apache.zookeeper:zookeeper:3.4.8')
