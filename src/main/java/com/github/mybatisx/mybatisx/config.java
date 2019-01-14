@@ -16,8 +16,10 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -51,7 +53,7 @@ public class config implements EnvironmentAware {
     public AspectJExpressionPointcut aspectJExpressionPointcut() {
         var pointcut = new AspectJExpressionPointcutX();
         var pkg = TempUtil.daoPackageNames;
-        pointcut.setExpression("execution(public * com.github.mybatisx_demo_api..*.*(..))");
+        pointcut.setExpression("execution(public * com.github.userservice..*.*(..))");
         return pointcut;
     }
 

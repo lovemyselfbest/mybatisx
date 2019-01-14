@@ -11,6 +11,7 @@ import com.github.mybatisx.webx.ResponseData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
@@ -28,6 +29,7 @@ import java.lang.reflect.Method;
 
 @Component
 @Order(Integer.MAX_VALUE - 1)
+
 public class FeignHandler implements InvocationHandler {
 
     public FeignHandler() {
