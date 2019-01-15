@@ -40,7 +40,7 @@ public class FeignHandler implements InvocationHandler {
 
     static {
         headers = new HttpHeaders();
-        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        headers.add("Content-Type", "application/json");
 
     }
 
@@ -71,11 +71,11 @@ public class FeignHandler implements InvocationHandler {
             throw new IllegalArgumentException(StringUtils.join("包名：", "pkName ", "没有配置版本号"));
         }
 
-
+        var PD = MD.getParameterDescriptors();
         MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
-        int i = 1;
+        int i = 0;
         for (var arg : args) {
-            postParameters.add("param" + i, JSON.toJSONString(arg));
+            postParameters.add(PD.get(i).getName(),arg);
             i++;
         }
 
@@ -95,7 +95,7 @@ public class FeignHandler implements InvocationHandler {
         }
         var uri = clazz0.getSimpleName() + "/" + MD.getMethod().getName() + "?city=sz";
         uri = uri.toLowerCase();
-        var params = new HttpEntity<MultiValueMap<String, Object>>(postParameters, headers);
+        var params = new HttpEntity<String>(JSON.toJSONString(postParameters), headers);
 
         var json = "";
         int retry = 0;

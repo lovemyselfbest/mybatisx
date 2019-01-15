@@ -4,6 +4,7 @@ package com.github.mybatisx.webx;
 import com.github.mybatisx.webx.register.WebxServiceImplScanner;
 import com.google.common.collect.Lists;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.zookeeper.discovery.ZookeeperDiscoveryProperties;
@@ -45,7 +46,7 @@ public class Config implements EnvironmentAware {
 
 
     @Bean
-    @ConditionalOnMissingBean(ZookeeperRegistration.class)
+    @ConditionalOnProperty(value = "spring.cloud.zookeeper.discovery.register", havingValue = "true")
     public ServiceInstanceRegistration serviceInstanceRegistration(ApplicationContext ctx, ZookeeperDiscoveryProperties properties) {
 
         String appName = env.getProperty("spring.application.name", "");

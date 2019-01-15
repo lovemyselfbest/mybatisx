@@ -20,17 +20,19 @@ buildscript {
     dependencies {
 
 
-        classpath "net.ltgt.gradle:gradle-apt-plugin:0.19"
+        //classpath "net.ltgt.gradle:gradle-apt-plugin:0.19"
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 apply plugin: 'maven'
 apply plugin: 'java-library'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
+//apply plugin: 'idea'
+//apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
+
+
 apply plugin: 'io.spring.dependency-management'
-apply plugin: "net.ltgt.apt"
+//apply plugin: "net.ltgt.apt"
 
 
 sourceCompatibility =11
@@ -44,7 +46,14 @@ repositories {
     mavenCentral()
 
 }
+dependencyManagement {
 
+
+
+    imports {
+        mavenBom 'org.springframework.boot:spring-boot-dependencies:2.1.1.RELEASE'
+    }
+}
 dependencies {
 
     implementation('org.springframework.boot:spring-boot-starter-aop:2.1.1.RELEASE')
@@ -69,18 +78,13 @@ dependencies {
 
     runtimeOnly('mysql:mysql-connector-java:8.0.13')
 
-    compile ('org.projectlombok:lombok:1.18.2')
-    annotationProcessor 'org.projectlombok:lombok:1.18.2'
+   compile ('org.projectlombok:lombok:1.18.2')
+   annotationProcessor 'org.projectlombok:lombok:1.18.2'
+   // compileOnly 'org.projectlombok:lombok'
 
 }
 
 
-ext['springCloudVersion'] = 'Greenwich.M3'
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
-}
 
 
 tasks.withType(JavaCompile){
