@@ -3,6 +3,7 @@ package com.github.mybatisx.webx;
 import com.alibaba.fastjson.JSON;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.util.IOUtils;
 import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.cache.FireFactory;
@@ -79,8 +80,8 @@ public class WebxMethodArgumentResolver implements HandlerMethodArgumentResolver
 
         Class<?> parameterType = PD.getRawType();
 
-
-        String value = jsonBodyMap.get(PD.getName());
+        var pName = PD.getName();
+        String value = jsonBodyMap.get(pName);
 
         if (StringUtils.isNotEmpty(value)) {
             //基本类型
@@ -125,8 +126,7 @@ public class WebxMethodArgumentResolver implements HandlerMethodArgumentResolver
         // 其他复杂对象
 
 
-
-       var result= JSON.parseObject(v, parameterType);
+        var result = JSON.parseObject(v, parameterType);
 
 
         return result;
@@ -135,7 +135,6 @@ public class WebxMethodArgumentResolver implements HandlerMethodArgumentResolver
 ////
 
     }
-
 
 
     /**
@@ -153,7 +152,8 @@ public class WebxMethodArgumentResolver implements HandlerMethodArgumentResolver
                 var jsonBody = IOUtils.readAll(servletRequest.getReader());
 
                 if (StringUtils.isNotEmpty(jsonBody)) {
-                    jsonBodyMap = JSON.parseObject(jsonBody, Map.class);
+                    jsonBodyMap = JSON.parseObject(jsonBody, new TypeReference<HashMap<String, String>>() {
+                    });
                 } else {
                     jsonBodyMap = new HashMap<String, String>();
                     jsonBodyMap.put("nobodyx", "");

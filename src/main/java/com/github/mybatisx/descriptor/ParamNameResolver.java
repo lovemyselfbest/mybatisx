@@ -1,5 +1,7 @@
 package com.github.mybatisx.descriptor;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
@@ -34,11 +36,6 @@ public class ParamNameResolver {
     //private final ParameterNameDiscoverer parameterNameDiscover = parameterNameDiscoverer();
 
     public static String getActualParamName(Method method, int paramIndex) {
-
-//        if(method.getName().contains("insert")){
-//            ParameterNameDiscoverer parameterNameDiscover = parameterNameDiscoverer();
-//            var kk= parameterNameDiscover.getParameterNames(method);
-//        }
 
 
         if (GET_PARAMS == null) {
