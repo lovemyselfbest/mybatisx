@@ -65,13 +65,21 @@ public class Config implements EnvironmentAware {
 
         appName = String.join("/", appName, version);
 
-        String host = properties.getInstanceHost();
+        String host = env.getProperty("MY_APP_HOSTIP", "");
+        if(StringUtils.isEmpty(host)){
+            host = properties.getInstanceHost();
+        }
+
         if (!StringUtils.hasText(host)) {
             throw new IllegalStateException("instanceHost must not be empty");
         }
 
-        ZookeeperInstance zookeeperInstance = new ZookeeperInstance(ctx.getId(),
-                appName, properties.getMetadata());
+        String port = env.getProperty("MY_APP_PORT", "");
+
+        if (StringUtils.hasText(port)) {
+            properties.setInstancePort(Integer.parseInt(port));
+        }
+        ZookeeperInstance zookeeperInstance = new ZookeeperInstance(ctx.getId(), appName, properties.getMetadata());
         ServiceInstanceRegistration.RegistrationBuilder builder = ServiceInstanceRegistration.builder().address(host)
                 .name(appName).payload(zookeeperInstance)
                 .uriSpec(properties.getUriSpec());
