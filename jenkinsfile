@@ -29,7 +29,7 @@ node('master') {
 
 
         stage('Git'){
-               git 'https://github.com/mybatisx/mybatisx.git'
+               git branch:'1.0.0' url:'https://github.com/mybatisx/mybatisx.git'
             }
 
 
