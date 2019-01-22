@@ -46,7 +46,7 @@ public class Config implements EnvironmentAware {
 
 
     @Bean
-    @ConditionalOnProperty(value = "spring.cloud.zookeeper.discovery.register", havingValue = "true")
+   //@ConditionalOnProperty(value = "spring.cloud.zookeeper.discovery.register", havingValue = "true")
     public ServiceInstanceRegistration serviceInstanceRegistration(ApplicationContext ctx, ZookeeperDiscoveryProperties properties) {
 
         String appName = env.getProperty("spring.application.name", "");

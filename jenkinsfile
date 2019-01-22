@@ -1,0 +1,51 @@
+node('master') {
+
+    def appName = 'mybatisx'
+
+
+    def mvnProfile = 'dev'
+
+    def harborServer = 'harbor.34580.com'
+    def harborUser = '0000516'
+    def harborPwd  = 'Windows2000'
+
+
+    def k8sUUID = java.util.UUID.randomUUID()
+    def gitHash = sh (script: 'date -d today +"%Y%m%d-%H-%M-%S"',  returnStdout: true ).trim()
+
+
+
+
+    def dockerImageTag = "${harborServer}/test/userservice/${appName}:${gitHash}"
+
+
+    def workspace = sh (
+                            script: 'cd ${WORKSPACE}@script/ && pwd', //script: 'cd ${WORKSPACE}@script/order/orderdata-host/ && pwd',
+                            returnStdout: true
+                       ).trim()
+
+
+    dir(workspace){
+
+
+        stage('Git'){
+               git 'https://github.com/mybatisx/mybatisx.git'
+            }
+
+
+
+        stage('Clean'){
+                           sh "./gradlew :clean"
+                        }
+
+        stage('Jar'){
+            
+            sh "./gradlew :upload"
+        }
+
+
+
+
+    }
+
+}
