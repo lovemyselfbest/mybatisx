@@ -30,25 +30,17 @@ public class WebxServiceImplScanner implements BeanFactoryPostProcessor {
         DefaultListableBeanFactory dlbf = (DefaultListableBeanFactory) beanFactory;
         for (Class<?> daoClass : findMangoDaoClasses()) {
 
-            var interfaces = daoClass.getInterfaces();
-            for (var face : interfaces) {
+            //开始注册
+            GenericBeanDefinition bf = new GenericBeanDefinition();
+            bf.setBeanClassName(daoClass.getName());
+            // MutablePropertyValues pvs = bf.getPropertyValues();
+            // pvs.addPropertyValue("daoClass", daoClass);
+            bf.setBeanClass(daoClass);//factoryBeanClass
+            //  bf.setPropertyValues(pvs);
+            //  bf.setLazyInit(false);
 
-                var anno = face.getAnnotation(WebxService.class);
-                if (anno != null) {
-                    //开始注册
-                    GenericBeanDefinition bf = new GenericBeanDefinition();
-                    bf.setBeanClassName(daoClass.getName());
-                    // MutablePropertyValues pvs = bf.getPropertyValues();
-                    // pvs.addPropertyValue("daoClass", daoClass);
-                    bf.setBeanClass(daoClass);//factoryBeanClass
-                    //  bf.setPropertyValues(pvs);
-                    //  bf.setLazyInit(false);
-
-                    bf.setPrimary(true);
-                    dlbf.registerBeanDefinition(daoClass.getName(), bf);
-                    //
-                }
-            }
+            bf.setPrimary(true);
+            dlbf.registerBeanDefinition(daoClass.getName(), bf);
         }
     }
 

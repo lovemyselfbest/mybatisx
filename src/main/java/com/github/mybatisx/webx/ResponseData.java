@@ -10,7 +10,7 @@ import lombok.*;
 public class ResponseData<T> {
 
    private int error;
-   private String msg;
+   private Object msg;
 
    private T data;
 

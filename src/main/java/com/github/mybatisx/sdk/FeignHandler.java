@@ -61,12 +61,17 @@ public class FeignHandler implements InvocationHandler {
 
         var MD = FireFactory.getFactory().getMD(method);
 
-        String version = "";
-        var webxService = MD.getDaoClass().getAnnotation(WebxService.class);
-        if (webxService != null) {
-            version = env.getProperty(webxService.value() + ".version", "");
-        }
+        String svcName = "",version="";
 
+        var webxService = AnnotationUtils.findAnnotation(MD.getDaoClass(),WebxService.class);
+
+        if (webxService != null) {
+            svcName= webxService.value();
+            version = webxService.version();
+        }
+        if (StringUtils.isEmpty(svcName)) {
+            throw new IllegalArgumentException(StringUtils.join("包名：", "pkName ", "没有配置服务名"));
+        }
         if (StringUtils.isEmpty(version)) {
             throw new IllegalArgumentException(StringUtils.join("包名：", "pkName ", "没有配置版本号"));
         }
@@ -79,10 +84,7 @@ public class FeignHandler implements InvocationHandler {
             i++;
         }
 
-        var servicePath = String.join("/", webxService.value(), version);
-
-
-
+        var servicePath = String.join("/", svcName, version);
 
         var clazz0 = MD.getDaoClass();
         if (!clazz0.isInterface()) {
@@ -91,10 +93,11 @@ public class FeignHandler implements InvocationHandler {
             if (faces.length > 0) {
                 clazz0 = faces[0];
             }
-
         }
+
         var uri = clazz0.getSimpleName() + "/" + MD.getMethod().getName() + "?city=sz";
         uri = uri.toLowerCase();
+
         var params = new HttpEntity<String>(JSON.toJSONString(postParameters), headers);
 
         var json = "";
@@ -138,9 +141,9 @@ public class FeignHandler implements InvocationHandler {
         }
 
         if (response.getError() == 10) {
-            throw new BizException(response.getMsg());
+            throw new BizException(response.getMsg().toString());
         } else if (response.getError() > 0) {
-            throw new Exception(response.getMsg());
+            throw new Exception(response.getMsg().toString());
         }
         return response.getData();
     }
