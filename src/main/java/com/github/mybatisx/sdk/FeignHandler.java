@@ -100,12 +100,9 @@ public class FeignHandler implements InvocationHandler {
 
         var uri = clazz0.getSimpleName() + "/" + MD.getMethod().getName() + "?city=sz";
         uri = uri.toLowerCase();
-<<<<<<< HEAD
-        var entity = new HttpEntity<String>(JSON.toJSONString(postParameters), headers);
-=======
 
-        var params = new HttpEntity<String>(JSON.toJSONString(postParameters), headers);
->>>>>>> 8257b21f4b33fcd8124324e6869b352246bd39aa
+        var entity = new HttpEntity<String>(JSON.toJSONString(postParameters), headers);
+
 
         var json = "";
         int retry = 0;
