@@ -6,6 +6,7 @@ import com.github.mybatisx.aspect.AspectJExpressionPointcutX;
 import com.github.mybatisx.aspect.cacheMethodInterceptor;
 import com.github.mybatisx.config.DynamicDataSource;
 import com.github.mybatisx.util.TempUtil;
+import com.github.mybatisx.webx.error.NotFoundException;
 import com.github.pagehelper.PageInterceptor;
 import lombok.SneakyThrows;
 import org.apache.ibatis.logging.log4j2.Log4j2Impl;
@@ -16,6 +17,7 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +50,10 @@ public class config implements EnvironmentAware {
 //    return a;
 //}
 
+//    @Bean
+//    public ErrorController notFoundException (){
+//        return  new NotFoundException();
+//    }
     @Bean
     @ConditionalOnMissingBean
     public AspectJExpressionPointcut aspectJExpressionPointcut() {

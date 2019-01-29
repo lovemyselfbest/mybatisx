@@ -6,6 +6,7 @@ import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.cache.FireFactory;
 import com.github.mybatisx.sdk.Sdk;
 
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.beans.BeansException;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
@@ -51,9 +53,6 @@ public class WebxReferencePostProcessor implements DisposableBean, BeanFactoryPo
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 
-        if (beanName.toLowerCase().contains("userservice")) {
-            String mm = "";
-        }
 
         Field[] fields = bean.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -87,6 +86,17 @@ public class WebxReferencePostProcessor implements DisposableBean, BeanFactoryPo
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+
+        if(beanName.toLowerCase().contains("errorcontroller")){
+
+            String mm="";
+        }
+//        if(ErrorController.class.isAssignableFrom(bean.getClass())){
+//           var b= new NotFoundException();
+//           return  b;
+//        }
+
+
         return bean;
     }
 

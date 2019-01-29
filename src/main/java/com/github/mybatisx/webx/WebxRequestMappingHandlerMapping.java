@@ -19,6 +19,14 @@ public class WebxRequestMappingHandlerMapping extends RequestMappingHandlerMappi
     @Override
     protected boolean isHandler(Class<?> beanType) {
 
+        if(beanType.getName().toLowerCase().contains("userlevel")){
+
+            String mm="";
+        }
+        if(beanType.getName().toLowerCase().contains("userdao")){
+
+            String mm="";
+        }
         var b1= (AnnotationUtils.findAnnotation(beanType, RestController.class) != null);
         var b2= (AnnotationUtils.findAnnotation(beanType, WebxService.class) != null);
         var b3= (AnnotationUtils.findAnnotation(beanType, org.springframework.stereotype.Controller.class) != null);

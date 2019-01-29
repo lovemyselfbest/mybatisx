@@ -37,7 +37,7 @@ public class WebxMethodArgumentResolver implements HandlerMethodArgumentResolver
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
 
-        var clazz = parameter.getDeclaringClass();
+        var clazz = parameter.getContainingClass();
         var b = AnnotationUtils.findAnnotation(clazz, WebxService.class);
         if (b != null)
             return true;
