@@ -18,6 +18,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -25,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 
 @Component
@@ -40,8 +42,9 @@ public class FeignHandler implements InvocationHandler {
 
     static {
         headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");
-
+        //headers.add("Content-Type", "application/json");
+        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
+        headers.setContentType(type);
     }
 
     @Autowired
@@ -72,10 +75,10 @@ public class FeignHandler implements InvocationHandler {
         }
 
         var PD = MD.getParameterDescriptors();
-        MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<>();
+        var postParameters = new HashMap<String,Object>();
         int i = 0;
         for (var arg : args) {
-            postParameters.add(PD.get(i).getName(),arg);
+            postParameters.put(PD.get(i).getName(),arg);
             i++;
         }
 
@@ -95,7 +98,7 @@ public class FeignHandler implements InvocationHandler {
         }
         var uri = clazz0.getSimpleName() + "/" + MD.getMethod().getName() + "?city=sz";
         uri = uri.toLowerCase();
-        var params = new HttpEntity<String>(JSON.toJSONString(postParameters), headers);
+        var entity = new HttpEntity<String>(JSON.toJSONString(postParameters), headers);
 
         var json = "";
         int retry = 0;
@@ -109,7 +112,7 @@ public class FeignHandler implements InvocationHandler {
 
                 var url = StringUtils.join("http://", hostAndPort, "/", uri);
 
-                json = restTemplate.postForObject(url, params, String.class);
+                json = restTemplate.postForObject(url, entity, String.class);
                 retry = 3;
             } catch (Exception ex) {
 
