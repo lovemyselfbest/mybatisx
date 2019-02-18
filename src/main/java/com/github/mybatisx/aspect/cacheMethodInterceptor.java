@@ -14,17 +14,12 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Update;
-import org.apache.ibatis.binding.MapperProxy;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.aop.MethodBeforeAdvice;
-import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 //MethodBeforeAdvice
 public class cacheMethodInterceptor implements MethodInterceptor {

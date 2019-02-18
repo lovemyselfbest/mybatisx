@@ -12,7 +12,7 @@ public class SpringUtils implements ApplicationContextAware {
 
     public SpringUtils(){
 
-        System.out.println("66");
+        System.out.println("SpringUtils 初始化");
     }
 
     private static ApplicationContext ctx;

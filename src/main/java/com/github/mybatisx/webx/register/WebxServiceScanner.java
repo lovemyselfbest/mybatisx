@@ -33,6 +33,11 @@ public class WebxServiceScanner  implements ImportBeanDefinitionRegistrar, Envir
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 
         Set<String> packagesToScan = getPackagesToScan(importingClassMetadata);
+
+        if (packagesToScan.size()==0){
+            return;
+        }
+
       ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
 //
 //        // this check is needed in Spring 3.1

@@ -124,7 +124,7 @@ public class WebxReferencePostProcessor implements DisposableBean, BeanFactoryPo
         // return referenceConfig.get();
         //var sdk = SpringUtils.getBean(Sdk.class);
         var sdk = ctx.getBean(Sdk.class);
-        var obj = sdk.getHandler(referenceClass);
+        Object obj = null;//sdk.getHandler(referenceClass);
         return obj;
     }
 

@@ -38,4 +38,9 @@ public class JsonUtil {
         var clazz= new TypeReference<ResponseData<T>>(type) {};
         return JSON.parseObject(json,clazz);
     }
+
+    public static <T> T parseTo(String json, Class<T> type) {
+
+        return JSON.parseObject(json,type);
+    }
 }

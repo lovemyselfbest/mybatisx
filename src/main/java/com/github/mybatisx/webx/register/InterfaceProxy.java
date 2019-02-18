@@ -3,6 +3,7 @@ package com.github.mybatisx.webx.register;
 import com.github.mybatisx.annotation.WebxService;
 import com.github.mybatisx.util.SpringUtils;
 import org.checkerframework.checker.index.qual.PolyUpperBound;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -21,12 +22,14 @@ public class InterfaceProxy implements InvocationHandler {
         Object ret = null;
         try {
 
-            var webxService = method.getDeclaringClass();
-            var anno = webxService.getAnnotation(WebxService.class);
+            var dao = method.getDeclaringClass();
+
+            var anno = AnnotationUtils.findAnnotation(dao,WebxService.class);
+
             if(anno!=null){
-                var beanName = webxService.getName() + "Impl";
-                var bean = SpringUtils.getBean(beanName);
-                ret = method.invoke(this, args);
+                //var beanName = dao.getName() + "Impl";
+                var bean = SpringUtils.getBean(dao);
+                ret = method.invoke(bean, args);
             }
 
 
