@@ -48,9 +48,10 @@ public class Listener1 implements ApplicationListener<ContextRefreshedEvent>, En
         String port = env.getProperty("MY_APP_PORT", "8080");
 
       //  DefaultZkClient zk = new DefaultZkClient("10.1.62.23:2181");
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");//设置日期格式
-        String date = df.format(new Date());// new Date()为获取当前系统时间，也可使用当前时间戳
-        zk.createEphemeral("/service/"+appName+"/"+date,host+port);
+        //SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");//设置日期格式
+        //String date = df.format(new Date());// new Date()为获取当前系统时间，也可使用当前时间戳
+       long v= System.currentTimeMillis();
+        zk.createEphemeral("/service/"+appName+"/"+ v,"http://"+host+":"+port);
 
         log.info("ContextRefreshedEvent 事件结束注册");
 
